@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Travel Map View Controller-->
@@ -18,33 +19,94 @@
                         <subviews>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wvk-jm-Ka6">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="P6x-tu-CyE"/>
+                                    <constraint firstAttribute="width" constant="400" id="hMi-8v-KMw"/>
+                                </constraints>
                                 <items>
                                     <navigationItem title="Virtual Tourist" id="MSA-pb-SAa">
                                         <barButtonItem key="rightBarButtonItem" title="Edit" id="Ete-sf-32f"/>
                                     </navigationItem>
                                 </items>
-                                <variation key="widthClass=compact" fixedFrame="YES">
-                                    <rect key="frame" x="0.0" y="22" width="400" height="44"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="P6x-tu-CyE"/>
+                                        <exclude reference="hMi-8v-KMw"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="P6x-tu-CyE"/>
+                                        <include reference="hMi-8v-KMw"/>
+                                    </mask>
                                 </variation>
                             </navigationBar>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="79n-1p-LST">
                                 <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                                <variation key="widthClass=compact" fixedFrame="YES">
-                                    <rect key="frame" x="0.0" y="66" width="400" height="534"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="534" id="RaK-r8-4qa"/>
+                                    <constraint firstAttribute="width" constant="400" id="m0A-uS-VjL"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="RaK-r8-4qa"/>
+                                        <exclude reference="m0A-uS-VjL"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <exclude reference="RaK-r8-4qa"/>
+                                        <include reference="m0A-uS-VjL"/>
+                                    </mask>
                                 </variation>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="79n-1p-LST" secondAttribute="bottom" id="5mT-oS-Lde"/>
+                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="topMargin" constant="22" id="7CN-a6-7QJ"/>
+                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="IuD-2K-cdB">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstAttribute="trailingMargin" secondItem="wvk-jm-Ka6" secondAttribute="trailing" id="SNx-Gw-coF">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="79n-1p-LST" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="SQa-OT-8TM">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstAttribute="trailingMargin" secondItem="79n-1p-LST" secondAttribute="trailing" id="qje-tq-90V">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="79n-1p-LST" firstAttribute="top" secondItem="wvk-jm-Ka6" secondAttribute="bottom" id="t32-fs-CSL"/>
+                        </constraints>
                         <variation key="default">
                             <mask key="subviews">
                                 <exclude reference="wvk-jm-Ka6"/>
                                 <exclude reference="79n-1p-LST"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="7CN-a6-7QJ"/>
+                                <exclude reference="IuD-2K-cdB"/>
+                                <exclude reference="SNx-Gw-coF"/>
+                                <exclude reference="SQa-OT-8TM"/>
+                                <exclude reference="qje-tq-90V"/>
+                                <exclude reference="t32-fs-CSL"/>
+                                <exclude reference="5mT-oS-Lde"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
                                 <include reference="wvk-jm-Ka6"/>
                                 <include reference="79n-1p-LST"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="7CN-a6-7QJ"/>
+                                <include reference="IuD-2K-cdB"/>
+                                <include reference="SNx-Gw-coF"/>
+                                <include reference="SQa-OT-8TM"/>
+                                <include reference="qje-tq-90V"/>
+                                <include reference="t32-fs-CSL"/>
+                                <include reference="5mT-oS-Lde"/>
                             </mask>
                         </variation>
                     </view>
