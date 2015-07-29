@@ -7,9 +7,13 @@
 //
 
 import UIKit
+import MapKit
 
 class TravelMapViewController: UIViewController {
 
+    @IBOutlet weak var editPinsButton: UIBarButtonItem!
+    @IBOutlet weak var mapView: MKMapView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
