@@ -20,7 +20,9 @@
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wvk-jm-Ka6">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="P6x-tu-CyE"/>
+                                    <constraint firstAttribute="height" constant="44" id="P6x-tu-CyE">
+                                        <variation key="widthClass=compact" constant="66"/>
+                                    </constraint>
                                     <constraint firstAttribute="width" constant="400" id="hMi-8v-KMw"/>
                                 </constraints>
                                 <items>
@@ -64,7 +66,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="79n-1p-LST" secondAttribute="bottom" id="5mT-oS-Lde"/>
-                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="topMargin" constant="22" id="7CN-a6-7QJ"/>
+                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="topMargin" constant="22" id="7CN-a6-7QJ">
+                                <variation key="widthClass=compact" constant="0.0"/>
+                            </constraint>
                             <constraint firstItem="wvk-jm-Ka6" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="IuD-2K-cdB">
                                 <variation key="widthClass=compact" constant="-16"/>
                             </constraint>
@@ -77,7 +81,9 @@
                             <constraint firstAttribute="trailingMargin" secondItem="79n-1p-LST" secondAttribute="trailing" id="qje-tq-90V">
                                 <variation key="widthClass=compact" constant="-16"/>
                             </constraint>
-                            <constraint firstItem="79n-1p-LST" firstAttribute="top" secondItem="wvk-jm-Ka6" secondAttribute="bottom" id="t32-fs-CSL"/>
+                            <constraint firstItem="79n-1p-LST" firstAttribute="top" secondItem="wvk-jm-Ka6" secondAttribute="bottom" id="t32-fs-CSL">
+                                <variation key="widthClass=compact" constant="0.0"/>
+                            </constraint>
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
