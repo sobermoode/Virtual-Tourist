@@ -2,12 +2,13 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Travel Map View Controller-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="vXZ-lx-hvc" customClass="TravelMapViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
@@ -15,8 +16,152 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins to Delete" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jas-3w-bIQ">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <color key="backgroundColor" red="1" green="0.14913141730000001" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="75" id="Vc5-O5-znm"/>
+                                    <constraint firstAttribute="width" constant="400" id="e0Z-BP-emP"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="AppleSDGothicNeo-Regular" family="Apple SD Gothic Neo" pointSize="20"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="Vc5-O5-znm"/>
+                                        <exclude reference="e0Z-BP-emP"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="Vc5-O5-znm"/>
+                                        <include reference="e0Z-BP-emP"/>
+                                    </mask>
+                                </variation>
+                            </label>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="79n-1p-LST">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="534" id="RaK-r8-4qa"/>
+                                    <constraint firstAttribute="width" constant="400" id="m0A-uS-VjL"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="RaK-r8-4qa"/>
+                                        <exclude reference="m0A-uS-VjL"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <exclude reference="RaK-r8-4qa"/>
+                                        <include reference="m0A-uS-VjL"/>
+                                    </mask>
+                                </variation>
+                            </mapView>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wvk-jm-Ka6">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="P6x-tu-CyE">
+                                        <variation key="widthClass=compact" constant="66"/>
+                                    </constraint>
+                                    <constraint firstAttribute="width" constant="400" id="hMi-8v-KMw"/>
+                                </constraints>
+                                <items>
+                                    <navigationItem title="Virtual Tourist" id="MSA-pb-SAa">
+                                        <barButtonItem key="rightBarButtonItem" title="Edit" id="Ete-sf-32f">
+                                            <connections>
+                                                <action selector="editPins:" destination="vXZ-lx-hvc" id="Fmq-qX-kMM"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="P6x-tu-CyE"/>
+                                        <exclude reference="hMi-8v-KMw"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="P6x-tu-CyE"/>
+                                        <include reference="hMi-8v-KMw"/>
+                                    </mask>
+                                </variation>
+                            </navigationBar>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="79n-1p-LST" secondAttribute="bottom" id="5mT-oS-Lde"/>
+                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="topMargin" constant="22" id="7CN-a6-7QJ">
+                                <variation key="widthClass=compact" constant="0.0"/>
+                            </constraint>
+                            <constraint firstItem="wvk-jm-Ka6" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="IuD-2K-cdB">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="Jas-3w-bIQ" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="QFd-wI-cjh">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstAttribute="trailingMargin" secondItem="wvk-jm-Ka6" secondAttribute="trailing" id="SNx-Gw-coF">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="79n-1p-LST" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="SQa-OT-8TM">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="Jas-3w-bIQ" secondAttribute="bottom" id="di4-CG-wvw"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="79n-1p-LST" secondAttribute="trailing" id="qje-tq-90V">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstAttribute="trailingMargin" secondItem="Jas-3w-bIQ" secondAttribute="trailing" id="ryn-G1-VTA">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="79n-1p-LST" firstAttribute="top" secondItem="wvk-jm-Ka6" secondAttribute="bottom" id="t32-fs-CSL">
+                                <variation key="widthClass=compact" constant="0.0"/>
+                            </constraint>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="Jas-3w-bIQ"/>
+                                <exclude reference="79n-1p-LST"/>
+                                <exclude reference="wvk-jm-Ka6"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="7CN-a6-7QJ"/>
+                                <exclude reference="IuD-2K-cdB"/>
+                                <exclude reference="SNx-Gw-coF"/>
+                                <exclude reference="SQa-OT-8TM"/>
+                                <exclude reference="qje-tq-90V"/>
+                                <exclude reference="t32-fs-CSL"/>
+                                <exclude reference="QFd-wI-cjh"/>
+                                <exclude reference="ryn-G1-VTA"/>
+                                <exclude reference="5mT-oS-Lde"/>
+                                <exclude reference="di4-CG-wvw"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="Jas-3w-bIQ"/>
+                                <include reference="79n-1p-LST"/>
+                                <include reference="wvk-jm-Ka6"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="7CN-a6-7QJ"/>
+                                <include reference="IuD-2K-cdB"/>
+                                <include reference="SNx-Gw-coF"/>
+                                <include reference="SQa-OT-8TM"/>
+                                <include reference="qje-tq-90V"/>
+                                <include reference="t32-fs-CSL"/>
+                                <include reference="QFd-wI-cjh"/>
+                                <include reference="ryn-G1-VTA"/>
+                                <include reference="5mT-oS-Lde"/>
+                                <include reference="di4-CG-wvw"/>
+                            </mask>
+                        </variation>
                     </view>
+                    <connections>
+                        <outlet property="editPinsButton" destination="Ete-sf-32f" id="y6C-bJ-rb0"/>
+                        <outlet property="mapView" destination="79n-1p-LST" id="sCr-e6-abQ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>

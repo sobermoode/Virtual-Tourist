@@ -7,9 +7,29 @@
 //
 
 import UIKit
+import MapKit
 
 class TravelMapViewController: UIViewController {
 
+    @IBOutlet weak var editPinsButton: UIBarButtonItem!
+    @IBOutlet weak var mapView: MKMapView!
+    
+    @IBAction func editPins( sender: UIBarButtonItem )
+    {
+        mapView.frame.origin.y -= 75.0
+        
+        editPinsButton.title = "Done"
+        editPinsButton.action = "dropMap:"
+    }
+    
+    func dropMap( sender: UIBarButtonItem )
+    {
+        mapView.frame.origin.y += 75.0
+        
+        editPinsButton.title = "Edit"
+        editPinsButton.action = "editPins:"
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
