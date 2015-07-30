@@ -9,12 +9,18 @@
 import UIKit
 import MapKit
 
+/* TODO: BUG #1
+    if you add a pin while the "tap pins to delete" label is active, the map will drop
+    back down, but the button won't change back to "edit," so if you continue to click
+    "done," the map will continue to get shifted -75 points and go offscreen.
+*/
+
 class TravelMapViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var editPinsButton: UIBarButtonItem!
     @IBOutlet weak var mapView: MKMapView!
     
-    var dropCoordinate: CLLocationCoordinate2D!
+    // var dropCoordinate: CLLocationCoordinate2D!
     
     @IBAction func editPins( sender: UIBarButtonItem )
     {
@@ -49,7 +55,11 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         let annotation = MKPointAnnotation()
         // annotation.coordinate = dropCoordinate
         let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
-        let mapCoordinate = mapView.convertPoint( recognizer.locationInView( self.view ), toCoordinateFromView: self.view )
+        let mapCoordinate = mapView.convertPoint(
+            recognizer.locationInView( self.view ),
+            toCoordinateFromView: self.view
+        )
+        
         annotation.coordinate = mapCoordinate
         
         switch recognizer.state
