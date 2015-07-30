@@ -126,16 +126,16 @@
                                 <exclude reference="wvk-jm-Ka6"/>
                             </mask>
                             <mask key="constraints">
+                                <exclude reference="5mT-oS-Lde"/>
+                                <exclude reference="di4-CG-wvw"/>
+                                <exclude reference="QFd-wI-cjh"/>
+                                <exclude reference="ryn-G1-VTA"/>
                                 <exclude reference="7CN-a6-7QJ"/>
                                 <exclude reference="IuD-2K-cdB"/>
                                 <exclude reference="SNx-Gw-coF"/>
                                 <exclude reference="SQa-OT-8TM"/>
                                 <exclude reference="qje-tq-90V"/>
                                 <exclude reference="t32-fs-CSL"/>
-                                <exclude reference="QFd-wI-cjh"/>
-                                <exclude reference="ryn-G1-VTA"/>
-                                <exclude reference="5mT-oS-Lde"/>
-                                <exclude reference="di4-CG-wvw"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
@@ -145,16 +145,16 @@
                                 <include reference="wvk-jm-Ka6"/>
                             </mask>
                             <mask key="constraints">
+                                <include reference="5mT-oS-Lde"/>
+                                <include reference="di4-CG-wvw"/>
+                                <include reference="QFd-wI-cjh"/>
+                                <include reference="ryn-G1-VTA"/>
                                 <include reference="7CN-a6-7QJ"/>
                                 <include reference="IuD-2K-cdB"/>
                                 <include reference="SNx-Gw-coF"/>
                                 <include reference="SQa-OT-8TM"/>
                                 <include reference="qje-tq-90V"/>
                                 <include reference="t32-fs-CSL"/>
-                                <include reference="QFd-wI-cjh"/>
-                                <include reference="ryn-G1-VTA"/>
-                                <include reference="5mT-oS-Lde"/>
-                                <include reference="di4-CG-wvw"/>
                             </mask>
                         </variation>
                     </view>
