@@ -37,29 +37,50 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 
         // Do any additional setup after loading the view.
         
-        let pinDropper = UILongPressGestureRecognizer(target: self, action: "dropPin")
-        pinDropper.minimumPressDuration = 1.0
+        let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
+        // pinDropper.minimumPressDuration = 1.0
         self.view.addGestureRecognizer( pinDropper )
     }
     
     func dropPin()
     {
-        println( "Pressing long..." )
+        // println( "Pressing long..." )
         
         let annotation = MKPointAnnotation()
-        annotation.coordinate = dropCoordinate
-        mapView.addAnnotation( annotation )
+        // annotation.coordinate = dropCoordinate
+        let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
+        let mapCoordinate = mapView.convertPoint( recognizer.locationInView( self.view ), toCoordinateFromView: self.view )
+        annotation.coordinate = mapCoordinate
+        
+        switch recognizer.state
+        {
+            case .Began:
+                println( "Began long press..." )
+                mapView.addAnnotation( annotation )
+                return
+            
+            case .Changed:
+                println( "Press is changing..." )
+                return
+            
+            case .Ended:
+                println( "Ending long press..." )
+                return
+            
+            default:
+                return
+        }
     }
     
-    override func touchesBegan( touches: Set<NSObject>, withEvent event: UIEvent )
-    {
-        let touch = touches.first! as! UITouch
-        println( "touch location: \( touch.locationInView( self.view ) )" )
-        
-        let mapCoordinate = mapView.convertPoint( touch.locationInView( self.view ), toCoordinateFromView: self.view )
-        dropCoordinate = mapCoordinate
-        println( "touch location in map: \( mapCoordinate.latitude ), \( mapCoordinate.longitude )" )
-    }
+//    override func touchesBegan( touches: Set<NSObject>, withEvent event: UIEvent )
+//    {
+//        let touch = touches.first! as! UITouch
+//        println( "touch location: \( touch.locationInView( self.view ) )" )
+//        
+//        let mapCoordinate = mapView.convertPoint( touch.locationInView( self.view ), toCoordinateFromView: self.view )
+//        dropCoordinate = mapCoordinate
+//        println( "touch location in map: \( mapCoordinate.latitude ), \( mapCoordinate.longitude )" )
+//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
