@@ -27,7 +27,24 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }()
     
+    var droppedPins: [ Pin ] = []
     var inEditMode: Bool = false
+    
+    func fetchAllPins() -> [ Pin ]
+    {
+        let fetchError: NSErrorPointer = nil
+        
+        let pinsFetchRequest = NSFetchRequest( entityName: "Pin" )
+        
+        let pins = sharedContext.executeFetchRequest( pinsFetchRequest, error: fetchError )
+        
+        if fetchError != nil
+        {
+            println( "There was an error fetching the pins from Core Data: \( fetchError )." )
+        }
+        
+        return pins as! [ Pin ]
+    }
     
     @IBAction func editPins( sender: UIBarButtonItem )
     {
@@ -54,11 +71,31 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 
         // Do any additional setup after loading the view.
         
+        droppedPins = fetchAllPins()
+        if !droppedPins.isEmpty
+        {
+            addDroppedPins()
+        }
+        
         let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
         // pinDropper.minimumPressDuration = 1.0
         self.view.addGestureRecognizer( pinDropper )
         
         mapView.delegate = self
+    }
+    
+    func addDroppedPins()
+    {
+        for pin in droppedPins
+        {
+            let newAnnotation = MKPointAnnotation()
+            newAnnotation.coordinate = CLLocationCoordinate2D(
+                latitude: pin.pinLatitude,
+                longitude: pin.pinLongitude
+            )
+            
+            mapView.addAnnotation( newAnnotation )
+        }
     }
     
     func dropPin()
@@ -83,6 +120,11 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         
         // mapView.addAnnotation( annotation )
         
+        /* TODO: use a dictionary to associate the new annotation with the Pin.
+            this needs to happen because otherwise i cant delete Pins from the
+            context, since the annotation view being used in the delegate
+            function is using the MKPointAnnotation and not the Pin object.
+        */
         let newPin = Pin(
             location: mapCoordinate,
             context: sharedContext
@@ -124,6 +166,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             // println( "didSelectAnnotationView" )
             let annotationToRemove = view.annotation
             mapView.removeAnnotation( annotationToRemove )
+            
+            sharedContext.deleteObject(<#object: NSManagedObject#>)
         }
     }
     

@@ -14,7 +14,8 @@ import MapKit
 
 class Pin: NSManagedObject
 {
-    @NSManaged var coordinate: CLLocationCoordinate2D
+    @NSManaged var pinLatitude: Double
+    @NSManaged var pinLongitude: Double
     
     init( location: CLLocationCoordinate2D, context: NSManagedObjectContext )
     {
@@ -28,7 +29,8 @@ class Pin: NSManagedObject
             insertIntoManagedObjectContext: context
         )
         
-        coordinate = location
+        pinLatitude = location.latitude
+        pinLongitude = location.longitude
     }
     
     override init( entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext? )
