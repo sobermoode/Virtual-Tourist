@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 /* TODO: BUG #1
     if you add a pin while the "tap pins to delete" label is active, the map will drop
@@ -21,6 +22,12 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var mapView: MKMapView!
     
     // var dropCoordinate: CLLocationCoordinate2D!
+    lazy var sharedContext: NSManagedObjectContext =
+    {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
+    }()
+    
+    var inEditMode: Bool = false
     
     @IBAction func editPins( sender: UIBarButtonItem )
     {
@@ -28,6 +35,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         
         editPinsButton.title = "Done"
         editPinsButton.action = "dropMap:"
+        
+        inEditMode = true
     }
     
     func dropMap( sender: UIBarButtonItem )
@@ -36,6 +45,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         
         editPinsButton.title = "Edit"
         editPinsButton.action = "editPins:"
+        
+        inEditMode = false
     }
     
     override func viewDidLoad() {
@@ -52,7 +63,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     {
         // println( "Pressing long..." )
         
-        let annotation = MKPointAnnotation()
+        
         // annotation.coordinate = dropCoordinate
         let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
         let mapCoordinate = mapView.convertPoint(
@@ -60,26 +71,41 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             toCoordinateFromView: self.view
         )
         
+        let annotation = MKPointAnnotation()
         annotation.coordinate = mapCoordinate
         
-        switch recognizer.state
-        {
-            case .Began:
-                println( "Began long press..." )
-                mapView.addAnnotation( annotation )
-                return
-            
-            case .Changed:
-                println( "Press is changing..." )
-                return
-            
-            case .Ended:
-                println( "Ending long press..." )
-                return
-            
-            default:
-                return
-        }
+//        let mapPin = MKPinAnnotationView(
+//            annotation: annotation,
+//            reuseIdentifier: "mapPin"
+//        )
+        
+        mapView.addAnnotation( annotation )
+        
+        let newPin = Pin(
+            location: mapCoordinate,
+            context: sharedContext
+        )
+        
+        CoreDataStackManager.sharedInstance().saveContext()
+        
+//        switch recognizer.state
+//        {
+//            case .Began:
+//                println( "Began long press..." )
+//                mapView.addAnnotation( annotation )
+//                return
+//            
+//            case .Changed:
+//                println( "Press is changing..." )
+//                return
+//            
+//            case .Ended:
+//                println( "Ending long press..." )
+//                return
+//            
+//            default:
+//                return
+//        }
     }
     
 //    override func touchesBegan( touches: Set<NSObject>, withEvent event: UIEvent )

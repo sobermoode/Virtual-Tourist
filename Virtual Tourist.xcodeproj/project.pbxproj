@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		813DEA101B6AEF850094E863 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813DEA0F1B6AEF850094E863 /* Pin.swift */; };
+		813DEA121B6AF4E10094E863 /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813DEA111B6AF4E10094E863 /* CoreDataStackManager.swift */; };
 		81443E481B697B020051352D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81443E471B697B020051352D /* AppDelegate.swift */; };
 		81443E4B1B697B020051352D /* Virtual_Tourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 81443E491B697B020051352D /* Virtual_Tourist.xcdatamodeld */; };
 		81443E4D1B697B020051352D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81443E4C1B697B020051352D /* ViewController.swift */; };
@@ -29,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		813DEA0F1B6AEF850094E863 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		813DEA111B6AF4E10094E863 /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
 		81443E421B697B020051352D /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81443E461B697B020051352D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		81443E471B697B020051352D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -90,6 +94,8 @@
 				81443E531B697B020051352D /* LaunchScreen.xib */,
 				81443E491B697B020051352D /* Virtual_Tourist.xcdatamodeld */,
 				81443E451B697B020051352D /* Supporting Files */,
+				813DEA0F1B6AEF850094E863 /* Pin.swift */,
+				813DEA111B6AF4E10094E863 /* CoreDataStackManager.swift */,
 				81443E6A1B697B620051352D /* TravelMapViewController.swift */,
 				81443E6C1B6992BB0051352D /* PinAnnotation.swift */,
 			);
@@ -224,6 +230,8 @@
 				81443E4D1B697B020051352D /* ViewController.swift in Sources */,
 				81443E4B1B697B020051352D /* Virtual_Tourist.xcdatamodeld in Sources */,
 				81443E6D1B6992BB0051352D /* PinAnnotation.swift in Sources */,
+				813DEA121B6AF4E10094E863 /* CoreDataStackManager.swift in Sources */,
+				813DEA101B6AEF850094E863 /* Pin.swift in Sources */,
 				81443E481B697B020051352D /* AppDelegate.swift in Sources */,
 				81443E6B1B697B620051352D /* TravelMapViewController.swift in Sources */,
 			);
