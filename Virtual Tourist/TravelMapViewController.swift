@@ -148,6 +148,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                 latitude: pin.pinLatitude,
                 longitude: pin.pinLongitude
             )
+            newAnnotation.title = "\( pinNumber )"
             
             mapView.addAnnotation( newAnnotation )
         }
@@ -167,6 +168,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         
         let annotation = MKPointAnnotation()
         annotation.coordinate = mapCoordinate
+        annotation.title = "\( totalPins )"
         
         // currentPins.updateValue( totalPins++, forKey: annotation )
         
@@ -174,8 +176,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             annotation: annotation,
             reuseIdentifier: "mapPin"
         )
+        // mapPin.tag = Int( totalPins )
         
         println( totalPins )
+        // println( mapPin.tag )
         // currentPins.updateValue( totalPins++, forKey: mapPin )
         
         // mapView.addAnnotation( annotation )
@@ -205,7 +209,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                     pin: mapPin,
                     context: sharedContext
                 )
+                
+                droppedPins.updateValue( newPin, forKey: totalPins )
                 totalPins++
+                
                 CoreDataStackManager.sharedInstance().saveContext()
                 return
             
@@ -224,8 +231,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     
     func mapView(
         mapView: MKMapView!,
-        inout didSelectAnnotationView view: MKAnnotationView!
-        )
+        didSelectAnnotationView view: MKAnnotationView!
+    )
     {
         if !inEditMode
         {
@@ -234,21 +241,22 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         else
         {
             // println( "didSelectAnnotationView" )
-            println( "view: \( view )" )
+            println( "view: \( view ), title: \( view.annotation.title )" )
             // let annotationToRemove = view.annotation
             let annotationToRemove = view as! MKPinAnnotationView
             println( "annotationToRemove: \( annotationToRemove )" )
             
-            
             // let pointView = view as! MKPointAnnotation
-            let pinNumber = currentPins[ annotationToRemove ]!
+            // let pinNumber = currentPins[ annotationToRemove ]!
+            let pinNumber = Int16( view.annotation.title!.toInt()! )
             println( "pinNumber: \( pinNumber )" )
-            let pinToRemove = droppedPins[ pinNumber ]!
+            let pinToRemove: Pin = droppedPins[ pinNumber ]!
             println( "pinToRemove: \( pinToRemove )" )
             
             currentPins.removeValueForKey( annotationToRemove )
             sharedContext.deleteObject( pinToRemove )
             mapView.removeAnnotation( annotationToRemove.annotation )
+            CoreDataStackManager.sharedInstance().saveContext()
         }
     }
     
