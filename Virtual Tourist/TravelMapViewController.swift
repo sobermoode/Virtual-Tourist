@@ -21,13 +21,11 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var editPinsButton: UIBarButtonItem!
     @IBOutlet weak var mapView: MKMapView!
     
-    // var dropCoordinate: CLLocationCoordinate2D!
     lazy var sharedContext: NSManagedObjectContext =
     {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }()
     
-    // var droppedPins: [ Pin ] = []
     var droppedPins: [ Int16 : Pin ] = [ Int16 : Pin ]()
     var currentPins: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
     var totalPins: Int16 = 1
@@ -47,16 +45,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         {
             println( "There was an error fetching the pins from Core Data: \( fetchError )." )
         }
-        
-//        if let lastPin = pins.last! as? Pin
-//        {
-//            println( "totalPins: \( totalPins )" )
-//            totalPins = lastPin.pinNumber
-//        }
-//        else
-//        {
-//            println( "there weren't any pins." )
-//        }
         
         if !pins.isEmpty
         {
@@ -107,7 +95,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         
         let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
-        // pinDropper.minimumPressDuration = 1.0
         self.view.addGestureRecognizer( pinDropper )
         
         mapView.delegate = self
@@ -156,10 +143,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     
     func dropPin()
     {
-        // println( "Pressing long..." )
-        
-        
-        // annotation.coordinate = dropCoordinate
         let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
         let mapCoordinate = mapView.convertPoint(
             recognizer.locationInView( self.view ),
@@ -170,32 +153,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         annotation.coordinate = mapCoordinate
         annotation.title = "\( totalPins )"
         
-        // currentPins.updateValue( totalPins++, forKey: annotation )
-        
         let mapPin = MKPinAnnotationView(
             annotation: annotation,
             reuseIdentifier: "mapPin"
         )
-        // mapPin.tag = Int( totalPins )
-        
-        println( totalPins )
-        // println( mapPin.tag )
-        // currentPins.updateValue( totalPins++, forKey: mapPin )
-        
-        // mapView.addAnnotation( annotation )
-        
-        /* TODO: use a dictionary to associate the new annotation with the Pin.
-            this needs to happen because otherwise i cant delete Pins from the
-            context, since the annotation view being used in the delegate
-            function is using the MKPointAnnotation and not the Pin object.
-        */
-//        let newPin = Pin(
-//            location: mapCoordinate,
-//            number: totalPins++,
-//            context: sharedContext
-//        )
-        
-        // CoreDataStackManager.sharedInstance().saveContext()
         
         switch recognizer.state
         {
@@ -240,14 +201,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         else
         {
-            // println( "didSelectAnnotationView" )
             println( "view: \( view ), title: \( view.annotation.title )" )
-            // let annotationToRemove = view.annotation
             let annotationToRemove = view as! MKPinAnnotationView
             println( "annotationToRemove: \( annotationToRemove )" )
             
-            // let pointView = view as! MKPointAnnotation
-            // let pinNumber = currentPins[ annotationToRemove ]!
             let pinNumber = Int16( view.annotation.title!.toInt()! )
             println( "pinNumber: \( pinNumber )" )
             let pinToRemove: Pin = droppedPins[ pinNumber ]!
@@ -259,16 +216,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
         }
     }
-    
-//    override func touchesBegan( touches: Set<NSObject>, withEvent event: UIEvent )
-//    {
-//        let touch = touches.first! as! UITouch
-//        println( "touch location: \( touch.locationInView( self.view ) )" )
-//        
-//        let mapCoordinate = mapView.convertPoint( touch.locationInView( self.view ), toCoordinateFromView: self.view )
-//        dropCoordinate = mapCoordinate
-//        println( "touch location in map: \( mapCoordinate.latitude ), \( mapCoordinate.longitude )" )
-//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
