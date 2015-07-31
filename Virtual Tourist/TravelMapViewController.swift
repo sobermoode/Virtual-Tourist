@@ -30,27 +30,41 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     // var droppedPins: [ Pin ] = []
     var droppedPins: [ Int16 : Pin ] = [ Int16 : Pin ]()
     var currentPins: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
-    var totalPins: Int16 = 0
+    var totalPins: Int16 = 1
     var inEditMode: Bool = false
     
     func fetchAllPins() -> [ Pin ]
     {
+        println( "fetching all pins..." )
         let fetchError: NSErrorPointer = nil
         
         let pinsFetchRequest = NSFetchRequest( entityName: "Pin" )
         
-        let pins = sharedContext.executeFetchRequest( pinsFetchRequest, error: fetchError )!
+        let pins: [ AnyObject ] = sharedContext.executeFetchRequest( pinsFetchRequest, error: fetchError )!
+        println( "pins.count: \( pins.count )" )
         
         if fetchError != nil
         {
             println( "There was an error fetching the pins from Core Data: \( fetchError )." )
         }
         
-        if let lastPin = pins.last! as? Pin
+//        if let lastPin = pins.last! as? Pin
+//        {
+//            println( "totalPins: \( totalPins )" )
+//            totalPins = lastPin.pinNumber
+//        }
+//        else
+//        {
+//            println( "there weren't any pins." )
+//        }
+        
+        if !pins.isEmpty
         {
+            let lastPin: Pin! = pins.last! as? Pin
             totalPins = lastPin.pinNumber
         }
         
+        println( totalPins )
         return pins as! [ Pin ]
     }
     
@@ -79,11 +93,17 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 
         // Do any additional setup after loading the view.
         
-        let allPins: [ Pin ] = fetchAllPins()
+        var allPins: [ Pin ] = fetchAllPins()
         if !allPins.isEmpty
         {
-            droppedPins = createPinDictionary( allPins )
+            droppedPins = createPinDictionary( &allPins )
+            currentPins = updateCurrentPins( &droppedPins )
+            println( "currentPins: \( currentPins )" )
             addAllPins()
+        }
+        else
+        {
+            println( "allPins is empty." )
         }
         
         let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
@@ -93,13 +113,27 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         mapView.delegate = self
     }
     
-    func createPinDictionary( pins: [ Pin ] ) -> [ Int16 : Pin ]
+    func createPinDictionary( inout pins: [ Pin ] ) -> [ Int16 : Pin ]
     {
         var newPinDictionary: [ Int16 : Pin ] = [ Int16 : Pin ]()
         
         for pin in pins
         {
             newPinDictionary.updateValue( pin, forKey: pin.pinNumber )
+        }
+        
+        return newPinDictionary
+    }
+    
+    func updateCurrentPins( inout pins: [ Int16 : Pin ] ) -> [ MKPinAnnotationView : Int16 ]
+    {
+        var newPinDictionary: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
+        
+        for ( pinNumber, pin ) in pins
+        {
+            println( "pinNumber: \( pinNumber ), pin: \( pin )" )
+            newPinDictionary.updateValue( pinNumber, forKey: pin.mapPin )
+            totalPins++
         }
         
         return newPinDictionary
@@ -157,7 +191,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 //            context: sharedContext
 //        )
         
-        CoreDataStackManager.sharedInstance().saveContext()
+        // CoreDataStackManager.sharedInstance().saveContext()
         
         switch recognizer.state
         {
@@ -168,9 +202,11 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                 let newPin = Pin(
                     location: mapCoordinate,
                     number: totalPins,
+                    pin: mapPin,
                     context: sharedContext
                 )
                 totalPins++
+                CoreDataStackManager.sharedInstance().saveContext()
                 return
             
             case .Changed:
@@ -188,7 +224,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     
     func mapView(
         mapView: MKMapView!,
-        didSelectAnnotationView view: MKAnnotationView!
+        inout didSelectAnnotationView view: MKAnnotationView!
         )
     {
         if !inEditMode
