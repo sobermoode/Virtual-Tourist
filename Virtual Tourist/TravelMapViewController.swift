@@ -57,6 +57,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
         // pinDropper.minimumPressDuration = 1.0
         self.view.addGestureRecognizer( pinDropper )
+        
+        mapView.delegate = self
     }
     
     func dropPin()
@@ -79,7 +81,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 //            reuseIdentifier: "mapPin"
 //        )
         
-        mapView.addAnnotation( annotation )
+        // mapView.addAnnotation( annotation )
         
         let newPin = Pin(
             location: mapCoordinate,
@@ -88,24 +90,41 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         
         CoreDataStackManager.sharedInstance().saveContext()
         
-//        switch recognizer.state
-//        {
-//            case .Began:
-//                println( "Began long press..." )
-//                mapView.addAnnotation( annotation )
-//                return
-//            
-//            case .Changed:
-//                println( "Press is changing..." )
-//                return
-//            
-//            case .Ended:
-//                println( "Ending long press..." )
-//                return
-//            
-//            default:
-//                return
-//        }
+        switch recognizer.state
+        {
+            case .Began:
+                println( "Began long press..." )
+                mapView.addAnnotation( annotation )
+                return
+            
+            case .Changed:
+                println( "Press is changing..." )
+                return
+            
+            case .Ended:
+                println( "Ending long press..." )
+                return
+            
+            default:
+                return
+        }
+    }
+    
+    func mapView(
+        mapView: MKMapView!,
+        didSelectAnnotationView view: MKAnnotationView!
+        )
+    {
+        if !inEditMode
+        {
+            // segue to photo album
+        }
+        else
+        {
+            // println( "didSelectAnnotationView" )
+            let annotationToRemove = view.annotation
+            mapView.removeAnnotation( annotationToRemove )
+        }
     }
     
 //    override func touchesBegan( touches: Set<NSObject>, withEvent event: UIEvent )
