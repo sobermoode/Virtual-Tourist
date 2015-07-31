@@ -16,8 +16,9 @@ class Pin: NSManagedObject
 {
     @NSManaged var pinLatitude: Double
     @NSManaged var pinLongitude: Double
+    @NSManaged var pinNumber: Int16
     
-    init( location: CLLocationCoordinate2D, context: NSManagedObjectContext )
+    init( location: CLLocationCoordinate2D, number: Int16, context: NSManagedObjectContext )
     {
         let coordinateEntity = NSEntityDescription.entityForName(
             "Pin",
@@ -31,6 +32,7 @@ class Pin: NSManagedObject
         
         pinLatitude = location.latitude
         pinLongitude = location.longitude
+        pinNumber = number
     }
     
     override init( entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext? )

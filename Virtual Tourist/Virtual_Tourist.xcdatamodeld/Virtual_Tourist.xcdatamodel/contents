@@ -3,8 +3,9 @@
     <entity name="Pin" representedClassName="Pin" syncable="YES">
         <attribute name="pinLatitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pinLongitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="pinNumber" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Pin" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="Pin" positionX="-63" positionY="-18" width="128" height="90"/>
     </elements>
 </model>
