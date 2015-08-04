@@ -23,6 +23,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
     var droppedPins: [ Int16 : Pin ] = [ Int16 : Pin ]()
     var currentPins: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
     var totalPins: Int16 = 1
+    var didJustLoad: Bool = true
     var inEditMode: Bool = false
     
     func fetchAllPins() -> [ Pin ]
@@ -92,6 +93,38 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         self.view.addGestureRecognizer( pinDropper )
         
         mapView.delegate = self
+        
+        if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
+        {
+            let centerLatitude = mapInfo[ "centerLatitude" ]
+            let centerLongitude = mapInfo[ "centerLongitude" ]
+            let spanLatDelta = mapInfo[ "spanLatitudeDelta" ]
+            let spanLongDelta = mapInfo[ "spanLongitudeDelta" ]
+            
+            println( "centerLatitude: \( centerLatitude )" )
+            println( "centerLongitude: \( centerLongitude )" )
+            println( "spanLatitudeDelta: \( spanLatDelta )" )
+            println( "spanLongitudeDelta: \( spanLongDelta )" )
+            
+            mapView.region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(
+                    latitude: mapInfo[ "centerLatitude" ]!,
+                    longitude: mapInfo[ "centerLongitude" ]!
+                ),
+                span: MKCoordinateSpan(
+                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
+                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
+                )
+//                span: MKCoordinateSpan(
+//                    latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
+//                    longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
+//                )
+            )
+        }
+        else
+        {
+            println( "Couldn't get the map info..." )
+        }
     }
     
     func createPinDictionary( inout pins: [ Pin ] ) -> [ Int16 : Pin ]
@@ -215,6 +248,107 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
         }
     }
+    
+    func mapView(mapView: MKMapView!, regionWillChangeAnimated animated: Bool) {
+        if didJustLoad
+        {
+            if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
+            {
+                mapView.region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(
+                        latitude: mapInfo[ "centerLatitude" ]!,
+                        longitude: mapInfo[ "centerLongitude" ]!
+                    ),
+                    //                span: MKCoordinateSpan(
+                    //                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
+                    //                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
+                    //                )
+                    span: MKCoordinateSpan(
+                        latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
+                        longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
+                    )
+                )
+            }
+            else
+            {
+                println( "Couldn't get the map info..." )
+            }
+            
+            didJustLoad = false
+            
+            return
+        }
+    }
+    
+    func mapView(
+        mapView: MKMapView!,
+        regionDidChangeAnimated animated: Bool
+    )
+    {
+//        if didJustLoad
+//        {
+//            println( "did just load..." )
+//            didJustLoad = false
+//            
+//            if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
+//            {
+//                mapView.region = MKCoordinateRegion(
+//                    center: CLLocationCoordinate2D(
+//                        latitude: mapInfo[ "centerLatitude" ]!,
+//                        longitude: mapInfo[ "centerLongitude" ]!
+//                    ),
+//                    //                span: MKCoordinateSpan(
+//                    //                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
+//                    //                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
+//                    //                )
+//                    span: MKCoordinateSpan(
+//                        latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
+//                        longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
+//                    )
+//                )
+//            }
+//            else
+//            {
+//                println( "Couldn't get the map info..." )
+//            }
+//            
+//            return
+//        }
+        
+        println( "regionDidChangeAnimated" )
+        
+        // let mapRegion: MKCoordinateRegion = mapView.region
+        // let mapCenter: CLLocationCoordinate2D = mapView.centerCoordinate
+        
+        let mapRegionCenterLatitude: CLLocationDegrees = mapView.region.center.latitude
+        let mapRegionCenterLongitude: CLLocationDegrees = mapView.region.center.longitude
+        let mapRegionSpanLatitudeDelta: CLLocationDegrees = mapView.region.span.latitudeDelta
+        let mapRegionSpanLongitudeDelta: CLLocationDegrees = mapView.region.span.longitudeDelta
+        
+//        let mapRect: MKMapRect! = mapView.visibleMapRect
+//        println( "mapRect: \( mapRect )" )
+//        var mapDictionary: [ String : MKMapRect ] = [ String : MKMapRect ]()
+//        mapDictionary.updateValue( mapRect, forKey: "theMapRect" )
+        
+        // NSUserDefaults.standardUserDefaults().setObject( mapDictionary, forKey: "mapInfo" )
+        
+        println( "map span: \( mapView.region.span.latitudeDelta ), \( mapView.region.span.longitudeDelta )" )
+        
+        var mapDictionary: [ String : CLLocationDegrees ] = [ String : CLLocationDegrees ]()
+        mapDictionary.updateValue( mapRegionCenterLatitude, forKey: "centerLatitude" )
+        mapDictionary.updateValue( mapRegionCenterLongitude, forKey: "centerLongitude" )
+        mapDictionary.updateValue( mapRegionSpanLatitudeDelta, forKey: "spanLatitudeDelta" )
+        mapDictionary.updateValue( mapRegionSpanLongitudeDelta, forKey: "spanLongitudeDelta" )
+        
+        NSUserDefaults.standardUserDefaults().setObject( mapDictionary, forKey: "mapInfo" )
+        
+        // saveMapPosition( mapDictionary )
+    }
+    
+//    func saveMapPosition( mapInfo: [ String : CLLocationDegrees ] )
+//    {
+//        
+//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
