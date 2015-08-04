@@ -20,36 +20,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }()
     
-    var droppedPins: [ Int16 : Pin ] = [ Int16 : Pin ]()
-    var currentPins: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
-    var totalPins: Int16 = 1
     var didJustLoad: Bool = true
     var inEditMode: Bool = false
-    
-    func fetchAllPins() -> [ Pin ]
-    {
-        println( "fetching all pins..." )
-        let fetchError: NSErrorPointer = nil
-        
-        let pinsFetchRequest = NSFetchRequest( entityName: "Pin" )
-        
-        let pins: [ AnyObject ] = sharedContext.executeFetchRequest( pinsFetchRequest, error: fetchError )!
-        println( "pins.count: \( pins.count )" )
-        
-        if fetchError != nil
-        {
-            println( "There was an error fetching the pins from Core Data: \( fetchError )." )
-        }
-        
-        if !pins.isEmpty
-        {
-            let lastPin: Pin! = pins.last! as? Pin
-            totalPins = lastPin.pinNumber
-        }
-        
-        println( totalPins )
-        return pins as! [ Pin ]
-    }
     
     @IBAction func editPins( sender: UIBarButtonItem )
     {
@@ -76,18 +48,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
 
         // Do any additional setup after loading the view.
         
-        var allPins: [ Pin ] = fetchAllPins()
-        if !allPins.isEmpty
-        {
-            droppedPins = createPinDictionary( &allPins )
-            currentPins = updateCurrentPins( &droppedPins )
-            println( "currentPins: \( currentPins )" )
-            addAllPins()
-        }
-        else
-        {
-            println( "allPins is empty." )
-        }
+        Pin.fetchAllPins()
+        addAllPins()
         
         let pinDropper = UILongPressGestureRecognizer( target: self, action: "dropPin" )
         self.view.addGestureRecognizer( pinDropper )
@@ -118,42 +80,17 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    func createPinDictionary( inout pins: [ Pin ] ) -> [ Int16 : Pin ]
-    {
-        var newPinDictionary: [ Int16 : Pin ] = [ Int16 : Pin ]()
-        
-        for pin in pins
-        {
-            newPinDictionary.updateValue( pin, forKey: pin.pinNumber )
-        }
-        
-        return newPinDictionary
-    }
-    
-    func updateCurrentPins( inout pins: [ Int16 : Pin ] ) -> [ MKPinAnnotationView : Int16 ]
-    {
-        var newPinDictionary: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
-        
-        for ( pinNumber, pin ) in pins
-        {
-            println( "pinNumber: \( pinNumber ), pin: \( pin )" )
-            newPinDictionary.updateValue( pinNumber, forKey: pin.mapPin )
-            totalPins++
-        }
-        
-        return newPinDictionary
-    }
-    
     func addAllPins()
     {
-        for ( pinNumber, pin ) in droppedPins
+        println( "adding all pins..." )
+        for ( pinNumber, pin ) in Pin.droppedPins
         {
             let newAnnotation = MKPointAnnotation()
             newAnnotation.coordinate = CLLocationCoordinate2D(
                 latitude: pin.pinLatitude,
                 longitude: pin.pinLongitude
             )
-            newAnnotation.title = "\( pinNumber )"
+            newAnnotation.title = "\( pin.pinNumber )"
             
             mapView.addAnnotation( newAnnotation )
         }
@@ -167,35 +104,34 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         
         let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
-        let mapCoordinate = mapView.convertPoint(
-            recognizer.locationInView( self.view ),
-            toCoordinateFromView: self.view
-        )
-        
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = mapCoordinate
-        annotation.title = "\( totalPins )"
-        
-        let mapPin = MKPinAnnotationView(
-            annotation: annotation,
-            reuseIdentifier: "mapPin"
-        )
         
         switch recognizer.state
         {
             case .Began:
                 println( "Began long press..." )
+                println( "at \( recognizer.locationInView( self.view ) )")
+                let mapCoordinate = mapView.convertPoint(
+                    recognizer.locationInView( self.view ),
+                    toCoordinateFromView: self.view
+                )
+                
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = mapCoordinate
+                let mapPin = MKPinAnnotationView(
+                    annotation: annotation,
+                    reuseIdentifier: "mapPin"
+                )
                 mapView.addAnnotation( annotation )
-                currentPins.updateValue( totalPins, forKey: mapPin )
+                // currentPins.updateValue( totalPins, forKey: mapPin )
                 let newPin = Pin(
                     location: mapCoordinate,
-                    number: totalPins,
                     pin: mapPin,
                     context: sharedContext
                 )
+                annotation.title = "\( newPin.pinNumber )"
                 
-                droppedPins.updateValue( newPin, forKey: totalPins )
-                totalPins++
+                // droppedPins.updateValue( newPin, forKey: totalPins )
+                // totalPins++
                 
                 CoreDataStackManager.sharedInstance().saveContext()
                 return
@@ -224,16 +160,17 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         else
         {
-            println( "view: \( view ), title: \( view.annotation.title )" )
+            // println( "view: \( view ), title: \( view.annotation.title )" )
             let annotationToRemove = view as! MKPinAnnotationView
             println( "annotationToRemove: \( annotationToRemove )" )
             
             let pinNumber = Int16( view.annotation.title!.toInt()! )
             println( "pinNumber: \( pinNumber )" )
-            let pinToRemove: Pin = droppedPins[ pinNumber ]!
+            let pinToRemove: Pin = Pin.droppedPins[ pinNumber ]!
             println( "pinToRemove: \( pinToRemove )" )
             
-            currentPins.removeValueForKey( annotationToRemove )
+            // Pin.currentPins.removeValueForKey( annotationToRemove )
+            Pin.droppedPins.removeValueForKey( pinToRemove.pinNumber )
             sharedContext.deleteObject( pinToRemove )
             mapView.removeAnnotation( annotationToRemove.annotation )
             CoreDataStackManager.sharedInstance().saveContext()
