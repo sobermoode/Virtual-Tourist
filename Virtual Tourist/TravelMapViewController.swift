@@ -101,24 +101,15 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             let spanLatDelta = mapInfo[ "spanLatitudeDelta" ]
             let spanLongDelta = mapInfo[ "spanLongitudeDelta" ]
             
-            println( "centerLatitude: \( centerLatitude )" )
-            println( "centerLongitude: \( centerLongitude )" )
-            println( "spanLatitudeDelta: \( spanLatDelta )" )
-            println( "spanLongitudeDelta: \( spanLongDelta )" )
-            
             mapView.region = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(
                     latitude: mapInfo[ "centerLatitude" ]!,
                     longitude: mapInfo[ "centerLongitude" ]!
                 ),
                 span: MKCoordinateSpan(
-                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
-                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
+                    latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
+                    longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
                 )
-//                span: MKCoordinateSpan(
-//                    latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
-//                    longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
-//                )
             )
         }
         else
@@ -259,10 +250,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                         latitude: mapInfo[ "centerLatitude" ]!,
                         longitude: mapInfo[ "centerLongitude" ]!
                     ),
-                    //                span: MKCoordinateSpan(
-                    //                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
-                    //                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
-                    //                )
                     span: MKCoordinateSpan(
                         latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
                         longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
@@ -285,54 +272,14 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         regionDidChangeAnimated animated: Bool
     )
     {
-//        if didJustLoad
-//        {
-//            println( "did just load..." )
-//            didJustLoad = false
-//            
-//            if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
-//            {
-//                mapView.region = MKCoordinateRegion(
-//                    center: CLLocationCoordinate2D(
-//                        latitude: mapInfo[ "centerLatitude" ]!,
-//                        longitude: mapInfo[ "centerLongitude" ]!
-//                    ),
-//                    //                span: MKCoordinateSpan(
-//                    //                    latitudeDelta: (mapInfo[ "centerLatitude" ]! - mapInfo[ "spanLatitudeDelta" ]!),
-//                    //                    longitudeDelta: (mapInfo[ "centerLongitude" ]! - mapInfo[ "spanLongitudeDelta" ]!)
-//                    //                )
-//                    span: MKCoordinateSpan(
-//                        latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
-//                        longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
-//                    )
-//                )
-//            }
-//            else
-//            {
-//                println( "Couldn't get the map info..." )
-//            }
-//            
-//            return
-//        }
-        
-        println( "regionDidChangeAnimated" )
-        
-        // let mapRegion: MKCoordinateRegion = mapView.region
-        // let mapCenter: CLLocationCoordinate2D = mapView.centerCoordinate
+        // println( "regionDidChangeAnimated" )
         
         let mapRegionCenterLatitude: CLLocationDegrees = mapView.region.center.latitude
         let mapRegionCenterLongitude: CLLocationDegrees = mapView.region.center.longitude
         let mapRegionSpanLatitudeDelta: CLLocationDegrees = mapView.region.span.latitudeDelta
         let mapRegionSpanLongitudeDelta: CLLocationDegrees = mapView.region.span.longitudeDelta
         
-//        let mapRect: MKMapRect! = mapView.visibleMapRect
-//        println( "mapRect: \( mapRect )" )
-//        var mapDictionary: [ String : MKMapRect ] = [ String : MKMapRect ]()
-//        mapDictionary.updateValue( mapRect, forKey: "theMapRect" )
-        
-        // NSUserDefaults.standardUserDefaults().setObject( mapDictionary, forKey: "mapInfo" )
-        
-        println( "map span: \( mapView.region.span.latitudeDelta ), \( mapView.region.span.longitudeDelta )" )
+        // println( "map span: \( mapView.region.span.latitudeDelta ), \( mapView.region.span.longitudeDelta )" )
         
         var mapDictionary: [ String : CLLocationDegrees ] = [ String : CLLocationDegrees ]()
         mapDictionary.updateValue( mapRegionCenterLatitude, forKey: "centerLatitude" )
@@ -341,14 +288,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         mapDictionary.updateValue( mapRegionSpanLongitudeDelta, forKey: "spanLongitudeDelta" )
         
         NSUserDefaults.standardUserDefaults().setObject( mapDictionary, forKey: "mapInfo" )
-        
-        // saveMapPosition( mapDictionary )
     }
-    
-//    func saveMapPosition( mapInfo: [ String : CLLocationDegrees ] )
-//    {
-//        
-//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
