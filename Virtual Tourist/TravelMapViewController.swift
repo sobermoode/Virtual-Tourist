@@ -20,36 +20,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }()
     
-    // var droppedPins: [ Int16 : Pin ] = [ Int16 : Pin ]()
-    // var currentPins: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
-    // var totalPins: Int16 = 1
     var didJustLoad: Bool = true
     var inEditMode: Bool = false
-    
-//    func fetchAllPins() -> [ Pin ]
-//    {
-//        println( "fetching all pins..." )
-//        let fetchError: NSErrorPointer = nil
-//        
-//        let pinsFetchRequest = NSFetchRequest( entityName: "Pin" )
-//        
-//        let pins: [ AnyObject ] = sharedContext.executeFetchRequest( pinsFetchRequest, error: fetchError )!
-//        println( "pins.count: \( pins.count )" )
-//        
-//        if fetchError != nil
-//        {
-//            println( "There was an error fetching the pins from Core Data: \( fetchError )." )
-//        }
-//        
-//        if !pins.isEmpty
-//        {
-//            let lastPin: Pin! = pins.last! as? Pin
-//            totalPins = lastPin.pinNumber
-//        }
-//        
-//        println( totalPins )
-//        return pins as! [ Pin ]
-//    }
     
     @IBAction func editPins( sender: UIBarButtonItem )
     {
@@ -75,19 +47,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
-//        var allPins: [ Pin ] = Pin.fetchAllPins()
-//        if !allPins.isEmpty
-//        {
-//            droppedPins = createPinDictionary( &allPins )
-//            currentPins = updateCurrentPins( &droppedPins )
-//            println( "currentPins: \( currentPins )" )
-//            addAllPins()
-//        }
-//        else
-//        {
-//            println( "allPins is empty." )
-//        }
         
         Pin.fetchAllPins()
         addAllPins()
@@ -121,32 +80,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-//    func createPinDictionary( inout pins: [ Pin ] ) -> [ Int16 : Pin ]
-//    {
-//        var newPinDictionary: [ Int16 : Pin ] = [ Int16 : Pin ]()
-//        
-//        for pin in pins
-//        {
-//            newPinDictionary.updateValue( pin, forKey: pin.pinNumber )
-//        }
-//        
-//        return newPinDictionary
-//    }
-//    
-//    func updateCurrentPins( inout pins: [ Int16 : Pin ] ) -> [ MKPinAnnotationView : Int16 ]
-//    {
-//        var newPinDictionary: [ MKPinAnnotationView : Int16 ] = [ MKPinAnnotationView : Int16 ]()
-//        
-//        for ( pinNumber, pin ) in pins
-//        {
-//            println( "pinNumber: \( pinNumber ), pin: \( pin )" )
-//            newPinDictionary.updateValue( pinNumber, forKey: pin.mapPin )
-//            totalPins++
-//        }
-//        
-//        return newPinDictionary
-//    }
-    
     func addAllPins()
     {
         println( "adding all pins..." )
@@ -160,18 +93,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             newAnnotation.title = "\( pin.pinNumber )"
             
             mapView.addAnnotation( newAnnotation )
-            
-//            println( "pinNumber: \( pinNumber ), pin: \( pin )" )
-//            
-//            // let currentPin = Pin.droppedPins[ pinNumber ]
-//            
-//            let currentPinAnnotationView = pin.mapPin
-//            println( "currentPinAnnotationView: \( currentPinAnnotationView )" )
-//            let currentAnnotation = pin.mapPin.annotation
-//            println( "currentAnnotation: \( currentAnnotation )" )
-//            
-//            // mapView.addAnnotation( currentAnnotation )
-//            mapView.addAnnotation( pin.mapPin.annotation )
         }
     }
     
@@ -183,21 +104,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         
         let recognizer = view.gestureRecognizers!.first as! UILongPressGestureRecognizer
-//        let mapCoordinate = mapView.convertPoint(
-//            recognizer.locationInView( self.view ),
-//            toCoordinateFromView: self.view
-//        )
-//        
-//        let annotation = MKPointAnnotation()
-//        annotation.coordinate = mapCoordinate
-        
-        // TODO: change the way pins are removed from the map to use the droppedPins dict, not the title property
-        // annotation.title = "\( Pin.totalPins )"
-        
-//        let mapPin = MKPinAnnotationView(
-//            annotation: annotation,
-//            reuseIdentifier: "mapPin"
-//        )
         
         switch recognizer.state
         {

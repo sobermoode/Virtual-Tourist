@@ -20,14 +20,7 @@ class Pin: NSManagedObject
     @NSManaged var mapPin: MKPinAnnotationView
     
     static var droppedPins = [ Int16 : Pin ]()
-    static var currentPins = [ MKPinAnnotationView : Int16 ]()
-    
     static var totalPins: Int = 0
-    
-//    static var totalPins: Int16
-//    {
-//        return Int16( self.droppedPins.count )
-//    }
     
     init( location: CLLocationCoordinate2D, pin: MKPinAnnotationView, context: NSManagedObjectContext )
     {
@@ -49,10 +42,7 @@ class Pin: NSManagedObject
         mapPin = pin
         println( "initing with mapPin.annotation: \( pin.annotation )." )
         
-        // Pin.totalPins++
-        
         Pin.droppedPins.updateValue( self, forKey: pinNumber )
-        Pin.currentPins.updateValue( pinNumber, forKey: mapPin )
     }
     
     override init( entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext? )
@@ -81,14 +71,6 @@ class Pin: NSManagedObject
             println( "There was an error fetching the pins from Core Data: \( fetchError )." )
         }
         
-//        if !pins.isEmpty
-//        {
-//            let lastPin: Pin! = pins.last! as? Pin
-//            totalPins = lastPin.pinNumber
-//        }
-        
-        // println( totalPins )
-        
         var lastPin: Int = 0
         for pin in pins
         {
@@ -97,7 +79,5 @@ class Pin: NSManagedObject
             lastPin = Int( pin.pinNumber )
         }
         totalPins = lastPin
-        
-        // return pins as! [ Pin ]
     }
 }
