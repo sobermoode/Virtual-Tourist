@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="dS8-E0-co4">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -165,6 +166,162 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
+        </scene>
+        <!--Photo Album View Controller-->
+        <scene sceneID="aox-gx-pEb">
+            <objects>
+                <viewController storyboardIdentifier="PhotoAlbum" id="dS8-E0-co4" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Ria-qU-QEH"/>
+                        <viewControllerLayoutGuide type="bottom" id="lfI-6N-svv"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Tra-jY-w2l">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sxh-kA-qiR">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="66" id="BJU-tN-77M"/>
+                                    <constraint firstAttribute="width" constant="400" id="wzb-xj-nJn"/>
+                                </constraints>
+                                <items>
+                                    <navigationItem title="Photo Album" id="r0G-cu-cir"/>
+                                </items>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="BJU-tN-77M"/>
+                                        <exclude reference="wzb-xj-nJn"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="BJU-tN-77M"/>
+                                        <include reference="wzb-xj-nJn"/>
+                                    </mask>
+                                </variation>
+                            </navigationBar>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No images were found for that location 😓" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oqx-CB-Udp">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" name="AppleSDGothicNeo-Regular" family="Apple SD Gothic Neo" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="43" y="174" width="315" height="64"/>
+                                </variation>
+                            </label>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="cvd-pT-EqP">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="Og1-P2-eZx">
+                                        <variation key="widthClass=compact" constant="125"/>
+                                    </constraint>
+                                    <constraint firstAttribute="width" constant="400" id="Z1p-H5-aYh"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="Og1-P2-eZx"/>
+                                        <exclude reference="Z1p-H5-aYh"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="Og1-P2-eZx"/>
+                                        <include reference="Z1p-H5-aYh"/>
+                                    </mask>
+                                </variation>
+                            </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rcR-EL-00K">
+                                <rect key="frame" x="-23" y="-15" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="400" id="3g1-Ov-sFj"/>
+                                    <constraint firstAttribute="height" constant="50" id="5bf-hj-0oT"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="AppleSDGothicNeo-Regular" family="Apple SD Gothic Neo" pointSize="18"/>
+                                <state key="normal" title="New Collection">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="3g1-Ov-sFj"/>
+                                        <exclude reference="5bf-hj-0oT"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="3g1-Ov-sFj"/>
+                                        <include reference="5bf-hj-0oT"/>
+                                    </mask>
+                                </variation>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="cvd-pT-EqP" secondAttribute="trailing" id="8JG-Up-gIl">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="Sxh-kA-qiR" firstAttribute="top" secondItem="Tra-jY-w2l" secondAttribute="topMargin" id="Fsx-ul-QMo"/>
+                            <constraint firstItem="cvd-pT-EqP" firstAttribute="leading" secondItem="Tra-jY-w2l" secondAttribute="leadingMargin" id="Q0I-yf-WL4">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="cvd-pT-EqP" firstAttribute="top" secondItem="Sxh-kA-qiR" secondAttribute="bottom" id="Q1S-my-59U"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Sxh-kA-qiR" secondAttribute="trailing" id="WUq-nJ-XHU">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="Sxh-kA-qiR" firstAttribute="leading" secondItem="Tra-jY-w2l" secondAttribute="leadingMargin" id="Y4o-rw-ldn">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="rcR-EL-00K" firstAttribute="leading" secondItem="Tra-jY-w2l" secondAttribute="leadingMargin" id="Z4v-Ng-Bwj">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                            <constraint firstItem="lfI-6N-svv" firstAttribute="top" secondItem="rcR-EL-00K" secondAttribute="bottom" id="uQF-At-9Y1"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="rcR-EL-00K" secondAttribute="trailing" id="vho-Cz-7eB">
+                                <variation key="widthClass=compact" constant="-16"/>
+                            </constraint>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="Sxh-kA-qiR"/>
+                                <exclude reference="Oqx-CB-Udp"/>
+                                <exclude reference="cvd-pT-EqP"/>
+                                <exclude reference="rcR-EL-00K"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="uQF-At-9Y1"/>
+                                <exclude reference="Z4v-Ng-Bwj"/>
+                                <exclude reference="vho-Cz-7eB"/>
+                                <exclude reference="Fsx-ul-QMo"/>
+                                <exclude reference="WUq-nJ-XHU"/>
+                                <exclude reference="Y4o-rw-ldn"/>
+                                <exclude reference="8JG-Up-gIl"/>
+                                <exclude reference="Q0I-yf-WL4"/>
+                                <exclude reference="Q1S-my-59U"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="Sxh-kA-qiR"/>
+                                <include reference="Oqx-CB-Udp"/>
+                                <include reference="cvd-pT-EqP"/>
+                                <include reference="rcR-EL-00K"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="uQF-At-9Y1"/>
+                                <include reference="Z4v-Ng-Bwj"/>
+                                <include reference="vho-Cz-7eB"/>
+                                <include reference="Fsx-ul-QMo"/>
+                                <include reference="WUq-nJ-XHU"/>
+                                <include reference="Y4o-rw-ldn"/>
+                                <include reference="8JG-Up-gIl"/>
+                                <include reference="Q0I-yf-WL4"/>
+                                <include reference="Q1S-my-59U"/>
+                            </mask>
+                        </variation>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="shz-Yt-Aw3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1324.5" y="450"/>
         </scene>
     </scenes>
 </document>
