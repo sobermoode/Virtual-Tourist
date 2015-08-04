@@ -43,35 +43,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         inEditMode = false
     }
     
-    /*
-    override func viewWillAppear( animated: Bool )
-    {
-        if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
-        {
-            let centerLatitude = mapInfo[ "centerLatitude" ]
-            let centerLongitude = mapInfo[ "centerLongitude" ]
-            let spanLatDelta = mapInfo[ "spanLatitudeDelta" ]
-            let spanLongDelta = mapInfo[ "spanLongitudeDelta" ]
-            
-            mapView.region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(
-                    latitude: mapInfo[ "centerLatitude" ]!,
-                    longitude: mapInfo[ "centerLongitude" ]!
-                ),
-                span: MKCoordinateSpan(
-                    latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
-                    longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
-                )
-            )
-            // mapView.setCenterCoordinate(CLLocationCoordinate2D(latitude: mapInfo["centerLatitude"]!, longitude: mapInfo["centerLongitude"]!), animated: true)
-        }
-        else
-        {
-            println( "Couldn't get the map info..." )
-        }
-    }
-*/
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -120,7 +91,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                     latitude: mapInfo[ "centerLatitude" ]!,
                     longitude: mapInfo[ "centerLongitude" ]!
                 ),
-                animated: false
+                animated: true
             )
         }
         else
@@ -244,37 +215,6 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
         }
     }
-    
-//    func mapView(
-//        mapView: MKMapView!,
-//        regionWillChangeAnimated animated: Bool
-//    )
-//    {
-//        if didJustLoad
-//        {
-//            if let mapInfo: [ String : CLLocationDegrees ] = NSUserDefaults.standardUserDefaults().dictionaryForKey( "mapInfo" ) as? [ String : CLLocationDegrees ]
-//            {
-//                mapView.region = MKCoordinateRegion(
-//                    center: CLLocationCoordinate2D(
-//                        latitude: mapInfo[ "centerLatitude" ]!,
-//                        longitude: mapInfo[ "centerLongitude" ]!
-//                    ),
-//                    span: MKCoordinateSpan(
-//                        latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
-//                        longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
-//                    )
-//                )
-//            }
-//            else
-//            {
-//                println( "Couldn't get the map info..." )
-//            }
-//            
-//            didJustLoad = false
-//            
-//            return
-//        }
-//    }
     
     func mapView(
         mapView: MKMapView!,
