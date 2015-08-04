@@ -157,7 +157,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                 latitude: pin.pinLatitude,
                 longitude: pin.pinLongitude
             )
-            newAnnotation.title = "\( pinNumber )"
+            newAnnotation.title = "\( pin.pinNumber )"
             
             mapView.addAnnotation( newAnnotation )
             
@@ -222,6 +222,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                     pin: mapPin,
                     context: sharedContext
                 )
+                annotation.title = "\( newPin.pinNumber )"
                 
                 // droppedPins.updateValue( newPin, forKey: totalPins )
                 // totalPins++
@@ -262,7 +263,8 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             let pinToRemove: Pin = Pin.droppedPins[ pinNumber ]!
             println( "pinToRemove: \( pinToRemove )" )
             
-            Pin.currentPins.removeValueForKey( annotationToRemove )
+            // Pin.currentPins.removeValueForKey( annotationToRemove )
+            Pin.droppedPins.removeValueForKey( pinToRemove.pinNumber )
             sharedContext.deleteObject( pinToRemove )
             mapView.removeAnnotation( annotationToRemove.annotation )
             CoreDataStackManager.sharedInstance().saveContext()

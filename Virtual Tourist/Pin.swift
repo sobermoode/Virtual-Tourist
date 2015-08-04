@@ -96,7 +96,6 @@ class Pin: NSManagedObject
             Pin.droppedPins.updateValue( pin as! Pin, forKey: pin.pinNumber )
             lastPin = Int( pin.pinNumber )
         }
-        
         totalPins = lastPin
         
         // return pins as! [ Pin ]
