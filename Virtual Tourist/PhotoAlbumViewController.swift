@@ -19,6 +19,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     
     var destination: CLLocationCoordinate2D!
     
+    let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -52,6 +54,30 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         
         destinationImagesCollection.dataSource = self
         destinationImagesCollection.delegate = self
+        
+        let flickrURL = NSURL( string: flickrQuery )!
+        let flickrRequest = NSURLRequest( URL: flickrURL )
+        
+        let flickrTask = NSURLSession.sharedSession().dataTaskWithRequest( flickrRequest )
+        {
+            data, response, error in
+            
+            if let flickrError = error
+            {
+                println( "There was an error with the Flickr request." )
+            }
+            else
+            {
+                // println( "response: \( response )" )
+                // println( "data: \( data )" )
+                var jsonificationError: NSErrorPointer = nil
+                if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: jsonificationError) as? NSDictionary
+                {
+                    println( "results: \( results )" )
+                }
+            }
+        }
+        flickrTask.resume()
     }
     
     func backToMap( sender: UIBarButtonItem )
