@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var noImagesLabel: UILabel!
@@ -49,6 +49,9 @@ class PhotoAlbumViewController: UIViewController {
         destinationAnnotation.coordinate = destination
         
         destinationMap.addAnnotation( destinationAnnotation )
+        
+        destinationImagesCollection.dataSource = self
+        destinationImagesCollection.delegate = self
     }
     
     func backToMap( sender: UIBarButtonItem )
@@ -58,7 +61,46 @@ class PhotoAlbumViewController: UIViewController {
             completion: nil
         )
     }
-
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int
+    {
+        return 21
+    }
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        cellForItemAtIndexPath indexPath: NSIndexPath
+    ) -> UICollectionViewCell
+    {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(
+            "photoAlbumImageCell",
+            forIndexPath: indexPath
+            ) as! PhotoAlbumImageCell
+        
+        return cell
+    }
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        didSelectItemAtIndexPath indexPath: NSIndexPath
+    )
+    {
+        println( "Selected a cell..." )
+        let cell = collectionView.cellForItemAtIndexPath( indexPath ) as! PhotoAlbumImageCell
+        
+        if cell.backgroundColor == UIColor.redColor()
+        {
+            cell.backgroundColor = UIColor.lightGrayColor()
+        }
+        else
+        {
+            cell.backgroundColor = UIColor.redColor()
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
