@@ -160,6 +160,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                     annotation: annotation,
                     reuseIdentifier: "mapPin"
                 )
+                mapPin.canShowCallout = false
                 mapView.addAnnotation( annotation )
                 // currentPins.updateValue( totalPins, forKey: mapPin )
                 let newPin = Pin(
@@ -168,6 +169,7 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
                     context: sharedContext
                 )
                 annotation.title = "\( newPin.pinNumber )"
+                mapPin.canShowCallout = false
                 
                 // droppedPins.updateValue( newPin, forKey: totalPins )
                 // totalPins++
@@ -196,6 +198,14 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         if !inEditMode
         {
             // segue to photo album
+            let photoAlbum = storyboard?.instantiateViewControllerWithIdentifier( "PhotoAlbum" ) as! PhotoAlbumViewController
+            photoAlbum.destination = view.annotation.coordinate
+            
+            presentViewController(
+                photoAlbum,
+                animated: true,
+                completion: nil
+            )
         }
         else
         {
