@@ -75,11 +75,32 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         cellForItemAtIndexPath indexPath: NSIndexPath
     ) -> UICollectionViewCell
     {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier( "photoAlbumImageCell", forIndexPath: indexPath ) as! PhotoAlbumImageCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(
+            "photoAlbumImageCell",
+            forIndexPath: indexPath
+            ) as! PhotoAlbumImageCell
         
         return cell
     }
-
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        didSelectItemAtIndexPath indexPath: NSIndexPath
+    )
+    {
+        println( "Selected a cell..." )
+        let cell = collectionView.cellForItemAtIndexPath( indexPath ) as! PhotoAlbumImageCell
+        
+        if cell.backgroundColor == UIColor.redColor()
+        {
+            cell.backgroundColor = UIColor.lightGrayColor()
+        }
+        else
+        {
+            cell.backgroundColor = UIColor.redColor()
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
