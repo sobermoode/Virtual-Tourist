@@ -18,6 +18,7 @@
 		81443E611B697B020051352D /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81443E601B697B020051352D /* Virtual_TouristTests.swift */; };
 		81443E6B1B697B620051352D /* TravelMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81443E6A1B697B620051352D /* TravelMapViewController.swift */; };
 		81443E6D1B6992BB0051352D /* PinAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81443E6C1B6992BB0051352D /* PinAnnotation.swift */; };
+		81AD3CBF1B719E4000D3E827 /* PhotoAlbumImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81AD3CBE1B719E4000D3E827 /* PhotoAlbumImageCell.swift */; };
 		81BF5B7B1B717ED800032F66 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BF5B7A1B717ED800032F66 /* PhotoAlbumViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 		81443E601B697B020051352D /* Virtual_TouristTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristTests.swift; sourceTree = "<group>"; };
 		81443E6A1B697B620051352D /* TravelMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelMapViewController.swift; sourceTree = "<group>"; };
 		81443E6C1B6992BB0051352D /* PinAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinAnnotation.swift; sourceTree = "<group>"; };
+		81AD3CBE1B719E4000D3E827 /* PhotoAlbumImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoAlbumImageCell.swift; path = ../PhotoAlbumImageCell.swift; sourceTree = "<group>"; };
 		81BF5B7A1B717ED800032F66 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -100,6 +102,7 @@
 				813DEA111B6AF4E10094E863 /* CoreDataStackManager.swift */,
 				81443E6A1B697B620051352D /* TravelMapViewController.swift */,
 				81BF5B7A1B717ED800032F66 /* PhotoAlbumViewController.swift */,
+				81AD3CBE1B719E4000D3E827 /* PhotoAlbumImageCell.swift */,
 				81443E6C1B6992BB0051352D /* PinAnnotation.swift */,
 			);
 			path = "Virtual Tourist";
@@ -233,6 +236,7 @@
 				81443E4D1B697B020051352D /* ViewController.swift in Sources */,
 				81443E4B1B697B020051352D /* Virtual_Tourist.xcdatamodeld in Sources */,
 				81443E6D1B6992BB0051352D /* PinAnnotation.swift in Sources */,
+				81AD3CBF1B719E4000D3E827 /* PhotoAlbumImageCell.swift in Sources */,
 				81BF5B7B1B717ED800032F66 /* PhotoAlbumViewController.swift in Sources */,
 				813DEA121B6AF4E10094E863 /* CoreDataStackManager.swift in Sources */,
 				813DEA101B6AEF850094E863 /* Pin.swift in Sources */,

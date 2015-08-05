@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController {
+class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var noImagesLabel: UILabel!
@@ -49,6 +49,9 @@ class PhotoAlbumViewController: UIViewController {
         destinationAnnotation.coordinate = destination
         
         destinationMap.addAnnotation( destinationAnnotation )
+        
+        destinationImagesCollection.dataSource = self
+        destinationImagesCollection.delegate = self
     }
     
     func backToMap( sender: UIBarButtonItem )
@@ -57,6 +60,24 @@ class PhotoAlbumViewController: UIViewController {
             true,
             completion: nil
         )
+    }
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int
+    {
+        return 21
+    }
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        cellForItemAtIndexPath indexPath: NSIndexPath
+    ) -> UICollectionViewCell
+    {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier( "photoAlbumImageCell", forIndexPath: indexPath ) as! PhotoAlbumImageCell
+        
+        return cell
     }
 
     override func didReceiveMemoryWarning() {
