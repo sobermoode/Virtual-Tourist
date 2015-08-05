@@ -7,13 +7,56 @@
 //
 
 import UIKit
+import MapKit
 
 class PhotoAlbumViewController: UIViewController {
 
+    @IBOutlet weak var navBar: UINavigationBar!
+    @IBOutlet weak var noImagesLabel: UILabel!
+    @IBOutlet weak var destinationMap: MKMapView!
+    @IBOutlet weak var newCollectionButton: UIButton!
+    @IBOutlet weak var destinationImagesCollection: UICollectionView!
+    
+    var destination: CLLocationCoordinate2D!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        var navItem = UINavigationItem( title: "Photo Album" )
+        
+        let backButton = UIBarButtonItem(
+            title: "Back to Map",
+            style: UIBarButtonItemStyle.Plain,
+            target: self,
+            action: "backToMap:"
+        )
+        
+        navItem.leftBarButtonItem = backButton
+        
+        navBar.items = [ navItem ]
+        
+        destinationMap.region = MKCoordinateRegion(
+            center: destination,
+            span: MKCoordinateSpan(
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1
+            )
+        )
+        
+        let destinationAnnotation = MKPointAnnotation()
+        destinationAnnotation.coordinate = destination
+        
+        destinationMap.addAnnotation( destinationAnnotation )
+    }
+    
+    func backToMap( sender: UIBarButtonItem )
+    {
+        dismissViewControllerAnimated(
+            true,
+            completion: nil
+        )
     }
 
     override func didReceiveMemoryWarning() {
