@@ -9,7 +9,8 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class PhotoAlbumViewController: UIViewController,
+    UICollectionViewDataSource, UICollectionViewDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate {
 
     @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var noImagesLabel: UILabel!
@@ -20,6 +21,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     var destination: CLLocationCoordinate2D!
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
+    var retrievedImage: UIImage? = nil
+    var session: NSURLSession? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,10 +61,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         let flickrURL = NSURL( string: flickrQuery )!
         let flickrRequest = NSURLRequest( URL: flickrURL )
         
-        let flickrTask = NSURLSession.sharedSession().dataTaskWithRequest( flickrRequest )
+        let sessionConfig: NSURLSessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        // let session: NSURLSession = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+        session = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+        let flickrTask = session!.dataTaskWithRequest( flickrRequest )
         {
             data, response, error in
             
+            println( "starting flckr query..." )
             if let flickrError = error
             {
                 println( "There was an error with the Flickr request." )
@@ -71,13 +78,130 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
                 // println( "response: \( response )" )
                 // println( "data: \( data )" )
                 var jsonificationError: NSErrorPointer = nil
-                if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: jsonificationError) as? NSDictionary
+                if let results = NSJSONSerialization.JSONObjectWithData(
+                    data,
+                    options: nil,
+                    error: jsonificationError
+                ) as? NSDictionary
                 {
-                    println( "results: \( results )" )
+                    // println( "results: \( results )" )
+                    if let photos = results[ "photos" ] as? [ String : AnyObject ],
+                        photoArray = photos[ "photo" ] as? [ [ String : AnyObject ] ]
+                    {
+                        // println( "photoArray: \( photoArray )" )
+                        let firstPhoto = photoArray[ 0 ]
+                        println( "firstPhoto: \( firstPhoto )" )
+                        
+//                        if let farmID = firstPhoto[ "farm" ] as? Int
+//                        {
+//                            println( "farmID: \( farmID )" )
+//                        }
+//                        if let serverID = firstPhoto[ "server" ] as? String
+//                        {
+//                            println( "serverID: \( serverID )" )
+//                        }
+//                        if let photoID = firstPhoto[ "id" ] as? String
+//                        {
+//                            println( "photoID: \( photoID )" )
+//                        }
+//                        if let secret = firstPhoto[ "secret" ] as? String
+//                        {
+//                            println( "secret: \( secret )" )
+//                        }
+                        
+                        let farmID = firstPhoto[ "farm" ] as? Int
+                        let serverID = firstPhoto[ "server" ] as? String
+                        let photoID = firstPhoto[ "id" ] as? String
+                        let secret = firstPhoto[ "secret" ] as? String
+                        
+                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
+                        println( "photoURLString: \( photoURLString )" )
+                        let photoURL = NSURL( string: photoURLString )!
+                        // let photoRequest = NSURLRequest( URL: photoURL )
+                        
+                        dispatch_async( dispatch_get_main_queue() )
+                        {
+                            let photoTask = self.session!.dataTaskWithURL( photoURL )
+                            {
+                                photoData, photoResponse, photoError in
+                                
+                                println( "starting photo download..." )
+                                if photoError != nil
+                                {
+                                    println( "There was an error getting the image from Flickr." )
+                                }
+                                else
+                                {
+                                    // println( "photoResponse: \( photoResponse )" )
+                                    // println( "photoData: \( photoData )" )
+                                    self.retrievedImage = UIImage( data: photoData )
+                                }
+                            }
+                            photoTask.resume()
+                            // println( "self.session.delegate: \( self.session!.delegate )" )
+                            /*
+                            let photoTask = session.dataTaskWithRequest( photoRequest )
+                            {
+                                photoData, photoResponse, photoError in
+                                
+                                if photoError != nil
+                                {
+                                    println( "There was an error getting the image from Flickr." )
+                                }
+                                else
+                                {
+                                    // println( "photoResponse: \( photoResponse )" )
+                                    // println( "photoData: \( photoData )" )
+                                    self.retrievedImage = UIImage( data: photoData )
+                                }
+                            }
+                            photoTask.resume()
+                            */
+                            /*
+                            let photoTask = session.downloadTaskWithURL( photoURL )
+                            {
+                                downloadURL, downloadResponse, downloadError in
+                                
+                                if downloadError != nil
+                                {
+                                    println( "There was an error downloading the image." )
+                                }
+                                else
+                                {
+                                    println( "downloadResponse: \( downloadResponse )" )
+                                    println( "downloadURL: \( downloadURL )" )
+                                    let imageData = NSData( contentsOfURL: downloadURL )!
+                                    self.retrievedImage = UIImage( data: imageData )
+                                }
+                            }
+                            photoTask.resume()
+                            */
+                        }
+                    }
+                    else
+                    {
+                        println( "There was a problem extracting the photos." )
+                    }
+                }
+                else
+                {
+                    println( "There was a problem parsing the results from Flickr." )
                 }
             }
         }
         flickrTask.resume()
+    }
+    
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+        println( "task: \( task ) completed." )
+    }
+    
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+        println( "Did receive data..." )
+    }
+    
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+        println( "Did receive response..." )
     }
     
     func backToMap( sender: UIBarButtonItem )
@@ -105,6 +229,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
             "photoAlbumImageCell",
             forIndexPath: indexPath
             ) as! PhotoAlbumImageCell
+        
+        if retrievedImage != nil
+        {
+            cell.destinationImage.image = retrievedImage!
+        }
         
         return cell
     }
