@@ -228,10 +228,18 @@ class PhotoAlbumViewController: UIViewController,
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(
             "photoAlbumImageCell",
             forIndexPath: indexPath
-            ) as! PhotoAlbumImageCell
+        ) as! PhotoAlbumImageCell
+        
+        println( "collection view width: \( collectionView.frame.size.width )" )
+        
+        // cell.frame.size.width = ( collectionView.frame.size.width / 3 ) - 10
+        cell.frame.size.width = ( collectionView.collectionViewLayout.collectionViewContentSize().width / 3 ) - 10
+        cell.frame.size.height = cell.frame.size.width
         
         if retrievedImage != nil
         {
+            // cell.destinationImage.frame.size = cell.frame.size
+            cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
             cell.destinationImage.image = retrievedImage!
         }
         
