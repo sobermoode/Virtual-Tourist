@@ -22,7 +22,6 @@ class PhotoAlbumViewController: UIViewController,
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
     var retrievedImage: UIImage? = nil
-    // var session: NSURLSession? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,9 +60,6 @@ class PhotoAlbumViewController: UIViewController,
         let flickrURL = NSURL( string: flickrQuery )!
         let flickrRequest = NSURLRequest( URL: flickrURL )
         
-        // let sessionConfig: NSURLSessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        // let session: NSURLSession = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
-        // session = NSURLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
         let flickrTask = NSURLSession.sharedSession().dataTaskWithRequest( flickrRequest )
         {
             flickrData, flickrResponse, flickrError in
