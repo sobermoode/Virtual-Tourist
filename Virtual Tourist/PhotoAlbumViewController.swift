@@ -19,6 +19,7 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
     var destination: CLLocationCoordinate2D!
+    var selectedCells: [ Int : PhotoAlbumImageCell ] = [ : ]
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
     var retrievedImage: UIImage? = nil
@@ -158,6 +159,18 @@ class PhotoAlbumViewController: UIViewController,
             cell.destinationImage.image = retrievedImage!
         }
         
+        if let selectedCell = selectedCells[ indexPath.item ]
+        {
+            cell.alpha = 0.35
+            // selectedCells.removeValueForKey( indexPath.item )
+            // selectedCells[ indexPath.item ] = nil
+        }
+        else
+        {
+            cell.alpha = 1.0
+            // selectedCells.updateValue( cell, forKey: indexPath.item )
+        }
+        
         return cell
     }
     
@@ -166,18 +179,59 @@ class PhotoAlbumViewController: UIViewController,
         didSelectItemAtIndexPath indexPath: NSIndexPath
     )
     {
-        println( "Selected a cell..." )
         let cell = collectionView.cellForItemAtIndexPath( indexPath ) as! PhotoAlbumImageCell
         
-        if cell.backgroundColor == UIColor.redColor()
+        if !cell.selected
         {
-            cell.backgroundColor = UIColor.lightGrayColor()
+            cell.selected = true
         }
         else
         {
-            cell.backgroundColor = UIColor.redColor()
+            cell.selected = false
+        }
+        
+        if let selectedCell = selectedCells[ indexPath.item ]
+        {
+            cell.alpha = 1.0
+            selectedCells.removeValueForKey( indexPath.item )
+        }
+        else
+        {
+            cell.alpha = 0.35
+            selectedCells.updateValue( cell, forKey: indexPath.item )
+        }
+        
+        println( "selectedCells.count: \( selectedCells.count )" )
+        
+        if selectedCells.count == 0
+        {
+            newCollectionButton.titleLabel?.text = "New Collection"
+        }
+        else
+        {
+            newCollectionButton.titleLabel?.text = "Remove Selected Pictures"
         }
     }
+    
+//    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+//        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(
+//            "photoAlbumImageCell",
+//            forIndexPath: indexPath
+//            ) as! PhotoAlbumImageCell
+//        
+//        println( "cell.selected: \( cell.selected )" )
+//        
+//        // cell.selected = false
+//        cell.alpha = 1.0
+//        selectedCells.removeValueForKey( indexPath.item )
+//        // selectedCells[ indexPath.item ] = nil
+//        if selectedCells.count == 0
+//        {
+//            newCollectionButton.titleLabel?.text = "New Collection"
+//        }
+//        
+//        println( "selectedCells.count: \( selectedCells.count )" )
+//    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
