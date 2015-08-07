@@ -20,6 +20,9 @@ class PhotoAlbumViewController: UIViewController,
     
     var destination: CLLocationCoordinate2D!
     var selectedCells: [ Int : PhotoAlbumImageCell ] = [ : ]
+    var haveSelectedPictures: Bool = false
+    var currentPictures: Int = 21
+    // var selectedCells: [ NSIndexPath ] = []
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
     var retrievedImage: UIImage? = nil
@@ -137,7 +140,7 @@ class PhotoAlbumViewController: UIViewController,
     ) -> Int
     {
         // TODO: change this to be a max of 21; if the location returns less than 21 images, return that amount.
-        return 21
+        return currentPictures
     }
     
     func collectionView(
@@ -202,15 +205,45 @@ class PhotoAlbumViewController: UIViewController,
         }
         
         println( "selectedCells.count: \( selectedCells.count )" )
+        haveSelectedPictures = ( selectedCells.count == 0 ) ? true : false
         
-        if selectedCells.count == 0
-        {
-            newCollectionButton.titleLabel?.text = "New Collection"
-        }
-        else
-        {
-            newCollectionButton.titleLabel?.text = "Remove Selected Pictures"
-        }
+        toggleNewCollectionButton()
+        newCollectionButton.addTarget(self, action: "removePictures", forControlEvents: UIControlEvents.TouchUpInside)
+        
+//        if selectedCells.count == 0
+//        {
+//            newCollectionButton.titleLabel?.text = "New Collection"
+//        }
+//        else
+//        {
+//            newCollectionButton.titleLabel?.text = "Remove Selected Pictures"
+//        }
+    }
+    
+    func removePictures()
+    {
+        currentPictures -= destinationImagesCollection.indexPathsForSelectedItems().count
+        destinationImagesCollection.deleteItemsAtIndexPaths( destinationImagesCollection.indexPathsForSelectedItems() as! [ NSIndexPath ] )
+    }
+    
+    func toggleNewCollectionButton()
+    {
+        newCollectionButton.titleLabel?.text = ( haveSelectedPictures ) ? "Remove Selected Pictures" : "New Collection"
+        
+//        if selectedCells.count == 0 && newCollectionButton.titleLabel?.text == "Remove Selected Pictures"
+//        {
+//            newCollectionButton.titleLabel?.text = "New Collection"
+//            return
+//        }
+//        else if selectedCells.count > 0 && newCollectionButton.titleLabel?.text == "New Collection"
+//        {
+//            newCollectionButton.titleLabel?.text = "Remove Selected Pictures"
+//            return
+//        }
+//        else
+//        {
+//            newCollectionButton.titleLabel?.text = newCollectionButton.titleLabel?.text
+//        }
     }
     
 //    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
