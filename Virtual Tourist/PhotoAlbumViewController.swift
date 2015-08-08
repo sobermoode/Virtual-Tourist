@@ -19,10 +19,13 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
     var destination: CLLocationCoordinate2D!
-    var currentPictures: Int = 21
+    var maxAlbumPhotos: Int = 30
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
-    var retrievedImage: UIImage? = nil
+    var flickrResultsPages: Int = 0
+    var flickrResultsPerPage: Int = 0
+    var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
+    var currentPhotoAlbum: [ UIImage? ] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,16 +62,18 @@ class PhotoAlbumViewController: UIViewController,
         destinationImagesCollection.dataSource = self
         destinationImagesCollection.delegate = self
         
-        newCollectionButton.addTarget( self, action: "newCollection", forControlEvents: .TouchUpInside )
+        newCollectionButton.addTarget(
+            self,
+            action: "newCollection",
+            forControlEvents: .TouchUpInside
+        )
         
         let flickrURL = NSURL( string: flickrQuery )!
-        let flickrRequest = NSURLRequest( URL: flickrURL )
         
-        let flickrTask = NSURLSession.sharedSession().dataTaskWithRequest( flickrRequest )
+        let flickrTask = NSURLSession.sharedSession().dataTaskWithURL( flickrURL )
         {
             flickrData, flickrResponse, flickrError in
             
-            println( "starting flckr query..." )
             if flickrError != nil
             {
                 println( "There was an error with the Flickr request: \( flickrError )" )
@@ -82,21 +87,38 @@ class PhotoAlbumViewController: UIViewController,
                     error: jsonificationError
                 ) as? [ String : AnyObject ]
                 {
-                    if let photos = results[ "photos" ] as? [ String : AnyObject ],
-                        photoArray = photos[ "photo" ] as? [ [ String : AnyObject ] ]
+                    let photos = results[ "photos" ] as! [ String : AnyObject ]
+                    self.flickrResultsPages = photos[ "pages" ] as! Int
+                    self.flickrResultsPerPage = photos[ "perpage" ] as! Int
+                    self.flickrResultsPhotos = photos[ "photo" ] as! [ [ String : AnyObject ] ]
+                    
+                    // set the initial photo album to the first 30 images (or max that was returned if less)
+                    // for every subsequent request for a new collection, test for ( remainingInPage - 30 > 0 )
+                    // and if not, that ( remainingPages > 0 ), and get the next 30 photos or the first 30 from
+                    // the next page. then update remainingInPage and remainingPages.
+                    var photoURLs: [ NSURL ] = []
+                    var initialAlbumMax = ( self.flickrResultsPhotos.count > 30 ) ? 30 : self.flickrResultsPhotos.count
+                    for initialAlbumCounter in 1...initialAlbumMax
                     {
-                        let firstPhoto = photoArray[ 0 ]
-                        let farmID = firstPhoto[ "farm" ] as? Int
-                        let serverID = firstPhoto[ "server" ] as? String
-                        let photoID = firstPhoto[ "id" ] as? String
-                        let secret = firstPhoto[ "secret" ] as? String
+                        let currentPhoto = self.flickrResultsPhotos[ initialAlbumCounter ] as [ String : AnyObject ]
+                        
+                        let farmID = currentPhoto[ "farm" ] as? Int
+                        let serverID = currentPhoto[ "server" ] as? String
+                        let photoID = currentPhoto[ "id" ] as? String
+                        let secret = currentPhoto[ "secret" ] as? String
                         
                         let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
                         let photoURL = NSURL( string: photoURLString )!
-                        
+                        photoURLs.append( photoURL )
+                    }
+                    
+                    self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
+                    var currentURLCounter = 0
+                    for currentURL in photoURLs
+                    {
                         dispatch_async( dispatch_get_main_queue() )
                         {
-                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( photoURL )
+                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
                             {
                                 photoData, photoResponse, photoError in
                                 
@@ -106,15 +128,13 @@ class PhotoAlbumViewController: UIViewController,
                                 }
                                 else
                                 {
-                                    self.retrievedImage = UIImage( data: photoData )
+                                    self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
                                 }
+                                
+                                currentURLCounter++
                             }
                             photoTask.resume()
                         }
-                    }
-                    else
-                    {
-                        println( "There was a problem extracting the photos." )
                     }
                 }
                 else
@@ -139,8 +159,7 @@ class PhotoAlbumViewController: UIViewController,
         numberOfItemsInSection section: Int
     ) -> Int
     {
-        // TODO: change this to be a max of 30; if the location returns less than 30 images, return that amount.
-        return currentPictures
+        return maxAlbumPhotos
     }
     
     func collectionView(
@@ -156,10 +175,15 @@ class PhotoAlbumViewController: UIViewController,
         cell.frame.size.width = ( collectionView.collectionViewLayout.collectionViewContentSize().width / 3 ) - 10
         cell.frame.size.height = cell.frame.size.width
         
-        if retrievedImage != nil
+        if currentPhotoAlbum.isEmpty
+        {
+            return cell
+        }
+        
+        if currentPhotoAlbum[ indexPath.item ] != nil
         {
             cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
-            cell.destinationImage.image = retrievedImage!
+            cell.destinationImage.image = currentPhotoAlbum[ indexPath.item ]
         }
         
         cell.alpha = ( cell.selected ) ? 0.35 : 1.0
@@ -220,7 +244,7 @@ class PhotoAlbumViewController: UIViewController,
     
     func removePictures()
     {
-        currentPictures -= destinationImagesCollection.indexPathsForSelectedItems().count
+        maxAlbumPhotos -= destinationImagesCollection.indexPathsForSelectedItems().count
         
         destinationImagesCollection.deleteItemsAtIndexPaths(
             destinationImagesCollection.indexPathsForSelectedItems() as! [ NSIndexPath ]
