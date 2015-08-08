@@ -27,7 +27,7 @@ class PhotoAlbumViewController: UIViewController,
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
     var currentPhotoAlbum: [ UIImage? ] = []
     var currentResultsPage: Int = 1
-    var photosRemainingInPage: Int
+    // var photosRemainingInPage: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,6 +93,7 @@ class PhotoAlbumViewController: UIViewController,
                     self.flickrResultsPages = photos[ "pages" ] as! Int
                     self.flickrResultsPerPage = photos[ "perpage" ] as! Int
                     self.flickrResultsPhotos = photos[ "photo" ] as! [ [ String : AnyObject ] ]
+                    // self.photosRemainingInPage = self.flickrResultsPhotos.count
                     
                     // set the initial photo album to the first 30 images (or max that was returned if less)
                     // for every subsequent request for a new collection, test for ( remainingInPage - 30 > 0 )
@@ -242,6 +243,21 @@ class PhotoAlbumViewController: UIViewController,
     func newCollection()
     {
         println( "Getting a new collection..." )
+        
+        // delete the first thirty photos already used in the page
+        let firstThirtyPhotos = 0...29
+        flickrResultsPhotos.removeRange( photosToRemove )
+        
+        // if the page has enough photos remaining to fill the album,
+        // we can use what's left instead of making another Flickr request
+        if flickrResultsPhotos.count >= maxAlbumPhotos
+        {
+            currentPhotoAlbum = []
+            for newPhotoForAlbum in firstThirtyPhotos
+            {
+                currentPhotoAlbum[ newPhotoForAlbum ] = flickrResultsPhotos[ newPhotoForAlbum ]
+            }
+        }
     }
     
     func removePictures()
