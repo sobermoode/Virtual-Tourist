@@ -19,6 +19,7 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
     var destination: CLLocationCoordinate2D!
+    var currentPictures: Int = 21
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
     var retrievedImage: UIImage? = nil
@@ -54,8 +55,11 @@ class PhotoAlbumViewController: UIViewController,
         
         destinationMap.addAnnotation( destinationAnnotation )
         
+        destinationImagesCollection.allowsMultipleSelection = true
         destinationImagesCollection.dataSource = self
         destinationImagesCollection.delegate = self
+        
+        newCollectionButton.addTarget( self, action: "newCollection", forControlEvents: .TouchUpInside )
         
         let flickrURL = NSURL( string: flickrQuery )!
         let flickrRequest = NSURLRequest( URL: flickrURL )
@@ -135,8 +139,8 @@ class PhotoAlbumViewController: UIViewController,
         numberOfItemsInSection section: Int
     ) -> Int
     {
-        // TODO: change this to be a max of 21; if the location returns less than 21 images, return that amount.
-        return 21
+        // TODO: change this to be a max of 30; if the location returns less than 30 images, return that amount.
+        return currentPictures
     }
     
     func collectionView(
@@ -158,6 +162,8 @@ class PhotoAlbumViewController: UIViewController,
             cell.destinationImage.image = retrievedImage!
         }
         
+        cell.alpha = ( cell.selected ) ? 0.35 : 1.0
+        
         return cell
     }
     
@@ -166,17 +172,69 @@ class PhotoAlbumViewController: UIViewController,
         didSelectItemAtIndexPath indexPath: NSIndexPath
     )
     {
-        println( "Selected a cell..." )
         let cell = collectionView.cellForItemAtIndexPath( indexPath ) as! PhotoAlbumImageCell
         
-        if cell.backgroundColor == UIColor.redColor()
+        cell.alpha = 0.35
+        
+        if collectionView.indexPathsForSelectedItems().count > 0
         {
-            cell.backgroundColor = UIColor.lightGrayColor()
+            newCollectionButton.setTitle(
+                "Remove Selected Pictures",
+                forState: .Normal
+            )
+            newCollectionButton.addTarget(
+                self,
+                action: "removePictures",
+                forControlEvents: .TouchUpInside
+            )
         }
-        else
+    }
+    
+    func collectionView(
+        collectionView: UICollectionView,
+        didDeselectItemAtIndexPath indexPath: NSIndexPath
+    )
+    {
+        let cell = collectionView.cellForItemAtIndexPath( indexPath ) as! PhotoAlbumImageCell
+        
+        cell.alpha = 1.0
+        
+        if collectionView.indexPathsForSelectedItems().count == 0
         {
-            cell.backgroundColor = UIColor.redColor()
+            newCollectionButton.setTitle(
+                "New Collection",
+                forState: .Normal
+            )
+            newCollectionButton.addTarget(
+                self,
+                action: "newCollection",
+                forControlEvents: .TouchUpInside
+            )
         }
+    }
+    
+    func newCollection()
+    {
+        println( "Getting a new collection..." )
+    }
+    
+    func removePictures()
+    {
+        currentPictures -= destinationImagesCollection.indexPathsForSelectedItems().count
+        
+        destinationImagesCollection.deleteItemsAtIndexPaths(
+            destinationImagesCollection.indexPathsForSelectedItems() as! [ NSIndexPath ]
+        )
+        
+        newCollectionButton.setTitle(
+            "New Collection",
+            forState: .Normal
+        )
+        newCollectionButton.addTarget(
+            self,
+            action: "newCollection",
+            forControlEvents: .TouchUpInside
+        )
     }
     
     override func didReceiveMemoryWarning() {
