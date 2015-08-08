@@ -26,6 +26,8 @@ class PhotoAlbumViewController: UIViewController,
     var flickrResultsPerPage: Int = 0
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
     var currentPhotoAlbum: [ UIImage? ] = []
+    var currentResultsPage: Int = 1
+    var photosRemainingInPage: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
