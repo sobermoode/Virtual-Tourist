@@ -19,9 +19,21 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
     var destination: CLLocationCoordinate2D!
+    
+    // TODO: use currentPhotoAlbum.count instead, or 30 if it's greater than that
     var maxAlbumPhotos: Int = 30
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
+    let flickrAPIBaseURL = "https://api.flickr.com/services/rest/?"
+    let flickrAPIMethod = "flickr.photos.search"
+    let flickrAPIKey = "71549104e5500eb7d194d040cc55ea10"
+    let flickrAPILatitude = "33.862237"
+    let flickrAPILongitude = "118.399519"
+    let flickrAPIPage = "1"
+    let flickrAPIPerPage = "250"
+    let flickrAPIFormat = "json"
+    let flickrAPICallback = "1"
+    
     var flickrResultsPages: Int = 0
     var flickrResultsPerPage: Int = 0
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
@@ -89,6 +101,7 @@ class PhotoAlbumViewController: UIViewController,
                     error: jsonificationError
                 ) as? [ String : AnyObject ]
                 {
+                    println( "original results: \( results )" )
                     let photos = results[ "photos" ] as! [ String : AnyObject ]
                     self.flickrResultsPages = photos[ "pages" ] as! Int
                     self.flickrResultsPerPage = photos[ "perpage" ] as! Int
@@ -244,20 +257,100 @@ class PhotoAlbumViewController: UIViewController,
     {
         println( "Getting a new collection..." )
         
-        // delete the first thirty photos already used in the page
-        let firstThirtyPhotos = 0...29
-        flickrResultsPhotos.removeRange( photosToRemove )
+        // get a random page of photos
+        // let randomPage = Int( arc4random_uniform( UInt32( flickrResultsPages ) ) ) + 1
         
-        // if the page has enough photos remaining to fill the album,
-        // we can use what's left instead of making another Flickr request
-        if flickrResultsPhotos.count >= maxAlbumPhotos
+        // construct the query
+        /*
+        "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&page=1&per_page=30&format=json&nojsoncallback=1"
+        let flickrAPIBaseURL = "https://api.flickr.com/services/rest/?"
+        let flickrAPIMethod = "flickr.photos.search"
+        let flickrAPIKey = "71549104e5500eb7d194d040cc55ea10"
+        let flickrAPILatitude = "33.862237"
+        let flickrAPILongitude = "118.399519"
+        let flickrAPIPage = "1"
+        let flickrAPIPerPage = "30"
+        let flickrAPIFormat = "json"
+        let flickrAPICallback = "1"
+        */
+        let newCollectionQuery = "\( flickrAPIBaseURL )method=\( flickrAPIMethod )&api_key=\( flickrAPIKey )&lat=\( flickrAPILatitude )&lon=\( flickrAPILongitude )&page=\( flickrAPIPage )&per_page=\( flickrAPIPerPage )&format=\( flickrAPIFormat )&nojsoncallback=\( flickrAPICallback )"
+        
+        // create the URL
+        let newCollectionURL = NSURL( string: newCollectionQuery )!
+        
+        // create and resume the task
+        let newCollectionTask = NSURLSession.sharedSession().dataTaskWithURL( newCollectionURL )
         {
-            currentPhotoAlbum = []
-            for newPhotoForAlbum in firstThirtyPhotos
+            newCollectionData, newCollectionResponse, newCollectionError in
+            
+            if newCollectionError != nil
             {
-                currentPhotoAlbum[ newPhotoForAlbum ] = flickrResultsPhotos[ newPhotoForAlbum ]
+                println( "There was an error requesting a new collection from Flickr: \( newCollectionError )" )
+            }
+            else
+            {
+                println( "newCollection response: \( newCollectionResponse )" )
+                var jsonificationError: NSErrorPointer = nil
+                if let newCollectionResults = NSJSONSerialization.JSONObjectWithData(
+                    newCollectionData,
+                    options: nil,
+                    error: jsonificationError
+                ) as? [ String : AnyObject ]
+                {
+                    println( "newCollectionResults: \( newCollectionResults )" )
+                    let newCollectionPhotos = newCollectionResults[ "photos" ] as! [ String : AnyObject ]
+                    let newCollectionAlbum = newCollectionPhotos[ "photo" ] as! [ [ String : AnyObject ] ]
+                    println( "newCollectionAlbum: \( newCollectionAlbum )" )
+                    
+                    var photoURLs: [ NSURL ] = []
+                    var newAlbumMax = ( newCollectionAlbum.count > 30 ) ? 30 : newCollectionAlbum.count
+                    for newAlbumCounter in 1...newAlbumMax
+                    {
+                        let currentPhoto = newCollectionAlbum[ newAlbumCounter ] as [ String : AnyObject ]
+                        
+                        let farmID = currentPhoto[ "farm" ] as? Int
+                        let serverID = currentPhoto[ "server" ] as? String
+                        let photoID = currentPhoto[ "id" ] as? String
+                        let secret = currentPhoto[ "secret" ] as? String
+                        
+                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
+                        let photoURL = NSURL( string: photoURLString )!
+                        photoURLs.append( photoURL )
+                    }
+                    
+                    self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
+                    self.maxAlbumPhotos = self.currentPhotoAlbum.count
+                    var currentURLCounter = 0
+                    for currentURL in photoURLs
+                    {
+                        dispatch_async( dispatch_get_main_queue() )
+                        {
+                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+                                {
+                                    photoData, photoResponse, photoError in
+                                    
+                                    if photoError != nil
+                                    {
+                                        println( "There was an error getting the image from Flickr: \( photoError )." )
+                                    }
+                                    else
+                                    {
+                                        self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
+                                    }
+                                    
+                                    currentURLCounter++
+                            }
+                            photoTask.resume()
+                        }
+                    }
+                }
+                else
+                {
+                    println( "There was a problem parsing the new collection." )
+                }
             }
         }
+        newCollectionTask.resume()
     }
     
     func removePictures()
