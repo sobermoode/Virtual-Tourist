@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 AaronJ. All rights reserved.
 //
 
+// TODO: there's still a bug when removing pictures multiple times; eventually, the number of pictures in the album
+// and the number being returned by collectionView:numberOfItemsInSection() is not matching, therefore crashing the app.
+
 import UIKit
 import MapKit
 
@@ -19,15 +22,26 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
     var destination: CLLocationCoordinate2D!
+    
+    // TODO: use currentPhotoAlbum.count instead, or 30 if it's greater than that
     var maxAlbumPhotos: Int = 30
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
+    let flickrAPIBaseURL = "https://api.flickr.com/services/rest/?"
+    let flickrAPIMethod = "flickr.photos.search"
+    let flickrAPIKey = "71549104e5500eb7d194d040cc55ea10"
+    let flickrAPILatitude = "33.862237"
+    let flickrAPILongitude = "118.399519"
+    let flickrAPIPage = "1"
+    let flickrAPIPerPage = "250"
+    let flickrAPIFormat = "json"
+    let flickrAPICallback = "1"
+    
     var flickrResultsPages: Int = 0
     var flickrResultsPerPage: Int = 0
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
     var currentPhotoAlbum: [ UIImage? ] = []
     var currentResultsPage: Int = 1
-    var photosRemainingInPage: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -208,6 +222,11 @@ class PhotoAlbumViewController: UIViewController,
                 "Remove Selected Pictures",
                 forState: .Normal
             )
+            newCollectionButton.removeTarget(
+                self,
+                action: "newCollection",
+                forControlEvents: .TouchUpInside
+            )
             newCollectionButton.addTarget(
                 self,
                 action: "removePictures",
@@ -231,6 +250,11 @@ class PhotoAlbumViewController: UIViewController,
                 "New Collection",
                 forState: .Normal
             )
+            newCollectionButton.removeTarget(
+                self,
+                action: "removePictures",
+                forControlEvents: .TouchUpInside
+            )
             newCollectionButton.addTarget(
                 self,
                 action: "newCollection",
@@ -242,6 +266,98 @@ class PhotoAlbumViewController: UIViewController,
     func newCollection()
     {
         println( "Getting a new collection..." )
+        
+        // construct the query
+        let newCollectionQuery = flickrQuery
+        
+        // create the URL
+        let newCollectionURL = NSURL( string: newCollectionQuery )!
+        
+        // create and resume the task
+        let newCollectionTask = NSURLSession.sharedSession().dataTaskWithURL( newCollectionURL )
+        {
+            newCollectionData, newCollectionResponse, newCollectionError in
+            
+            if newCollectionError != nil
+            {
+                println( "There was an error requesting a new collection from Flickr: \( newCollectionError )" )
+            }
+            else
+            {
+                var jsonificationError: NSErrorPointer = nil
+                if let newCollectionResults = NSJSONSerialization.JSONObjectWithData(
+                    newCollectionData,
+                    options: nil,
+                    error: jsonificationError
+                ) as? [ String : AnyObject ]
+                {
+                    let newCollectionPhotos = newCollectionResults[ "photos" ] as! [ String : AnyObject ]
+                    let newCollectionAlbumPossibles = newCollectionPhotos[ "photo" ] as! [ [ String : AnyObject ] ]
+                    
+                    var newAlbumMax = ( newCollectionAlbumPossibles.count > 30 ) ? 30 : newCollectionAlbumPossibles.count
+                    
+                    var photosToSelect = [ Int ]( count: newAlbumMax, repeatedValue: 0 )
+                    for newAlbumCounter in 0...newAlbumMax-1
+                    {
+                        var randoPhoto: Int
+                        do
+                        {
+                            randoPhoto = Int( arc4random_uniform( UInt32( newCollectionAlbumPossibles.count ) ) ) + 1
+                        }
+                        while contains( photosToSelect, randoPhoto )
+                        
+                        photosToSelect[ newAlbumCounter ] = randoPhoto
+                    }
+                    
+                    var photoURLs: [ NSURL ] = []
+                    for randoURLCounter in 0...newAlbumMax-1
+                    {
+                        let currentRando = photosToSelect[ randoURLCounter ]
+                        let currentPhoto = newCollectionAlbumPossibles[ currentRando ] as [ String : AnyObject ]
+                        
+                        let farmID = currentPhoto[ "farm" ] as? Int
+                        let serverID = currentPhoto[ "server" ] as? String
+                        let photoID = currentPhoto[ "id" ] as? String
+                        let secret = currentPhoto[ "secret" ] as? String
+                        
+                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
+                        let photoURL = NSURL( string: photoURLString )!
+                        photoURLs.append( photoURL )
+                    }
+                    
+                    self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
+                    self.maxAlbumPhotos = self.currentPhotoAlbum.count
+                    var currentURLCounter = 0
+                    for currentURL in photoURLs
+                    {
+                        dispatch_async( dispatch_get_main_queue() )
+                        {
+                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+                                {
+                                    photoData, photoResponse, photoError in
+                                    
+                                    if photoError != nil
+                                    {
+                                        println( "There was an error getting the image from Flickr: \( photoError )." )
+                                    }
+                                    else
+                                    {
+                                        self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
+                                    }
+                                    
+                                    currentURLCounter++
+                            }
+                            photoTask.resume()
+                        }
+                    }
+                }
+                else
+                {
+                    println( "There was a problem parsing the new collection." )
+                }
+            }
+        }
+        newCollectionTask.resume()
     }
     
     func removePictures()
@@ -255,6 +371,11 @@ class PhotoAlbumViewController: UIViewController,
         newCollectionButton.setTitle(
             "New Collection",
             forState: .Normal
+        )
+        newCollectionButton.removeTarget(
+            self,
+            action: "removePictures",
+            forControlEvents: .TouchUpInside
         )
         newCollectionButton.addTarget(
             self,
