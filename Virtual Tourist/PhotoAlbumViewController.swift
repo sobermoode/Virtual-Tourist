@@ -39,7 +39,6 @@ class PhotoAlbumViewController: UIViewController,
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
     var currentPhotoAlbum: [ UIImage? ] = []
     var currentResultsPage: Int = 1
-    // var photosRemainingInPage: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,12 +100,10 @@ class PhotoAlbumViewController: UIViewController,
                     error: jsonificationError
                 ) as? [ String : AnyObject ]
                 {
-                    println( "original results: \( results )" )
                     let photos = results[ "photos" ] as! [ String : AnyObject ]
                     self.flickrResultsPages = photos[ "pages" ] as! Int
                     self.flickrResultsPerPage = photos[ "perpage" ] as! Int
                     self.flickrResultsPhotos = photos[ "photo" ] as! [ [ String : AnyObject ] ]
-                    // self.photosRemainingInPage = self.flickrResultsPhotos.count
                     
                     // set the initial photo album to the first 30 images (or max that was returned if less)
                     // for every subsequent request for a new collection, test for ( remainingInPage - 30 > 0 )
@@ -257,24 +254,7 @@ class PhotoAlbumViewController: UIViewController,
     {
         println( "Getting a new collection..." )
         
-        // get a random page of photos
-        // let randomPage = Int( arc4random_uniform( UInt32( flickrResultsPages ) ) ) + 1
-        
         // construct the query
-        /*
-        "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&page=1&per_page=30&format=json&nojsoncallback=1"
-        let flickrAPIBaseURL = "https://api.flickr.com/services/rest/?"
-        let flickrAPIMethod = "flickr.photos.search"
-        let flickrAPIKey = "71549104e5500eb7d194d040cc55ea10"
-        let flickrAPILatitude = "33.862237"
-        let flickrAPILongitude = "118.399519"
-        let flickrAPIPage = "1"
-        let flickrAPIPerPage = "30"
-        let flickrAPIFormat = "json"
-        let flickrAPICallback = "1"
-        */
-        println( "perpage: \( flickrAPIPerPage )" )
-        // let newCollectionQuery = "\( flickrAPIBaseURL )method=\( flickrAPIMethod )&api_key=\( flickrAPIKey )&lat=\( flickrAPILatitude )&lon=\( flickrAPILongitude )&page=\( flickrAPIPage )&per_page=\( flickrAPIPerPage )&format=\( flickrAPIFormat )&nojsoncallback=\( flickrAPICallback )"
         let newCollectionQuery = flickrQuery
         
         // create the URL
@@ -291,7 +271,6 @@ class PhotoAlbumViewController: UIViewController,
             }
             else
             {
-                // println( "newCollection response: \( newCollectionResponse )" )
                 var jsonificationError: NSErrorPointer = nil
                 if let newCollectionResults = NSJSONSerialization.JSONObjectWithData(
                     newCollectionData,
@@ -299,21 +278,14 @@ class PhotoAlbumViewController: UIViewController,
                     error: jsonificationError
                 ) as? [ String : AnyObject ]
                 {
-                    println( "newCollectionResults: \( newCollectionResults )" )
                     let newCollectionPhotos = newCollectionResults[ "photos" ] as! [ String : AnyObject ]
-                    // println( "newCollectionPhotos:" )
-                    // dump( newCollectionPhotos, name: "newCollectionPhotos", indent: 0, maxDepth: 100, maxItems: 100 )
                     let newCollectionAlbumPossibles = newCollectionPhotos[ "photo" ] as! [ [ String : AnyObject ] ]
-                    println( "newCollectionAlbumPossibles.count: \( newCollectionAlbumPossibles.count )" )
                     
-                    // var photoURLs: [ NSURL ] = []
                     var newAlbumMax = ( newCollectionAlbumPossibles.count > 30 ) ? 30 : newCollectionAlbumPossibles.count
                     
-                    // var newAlbumCounter: Int = 0
                     var photosToSelect = [ Int ]( count: newAlbumMax, repeatedValue: 0 )
                     for newAlbumCounter in 0...newAlbumMax-1
                     {
-                        // println( "Getting a new random photo..." )
                         var randoPhoto: Int
                         do
                         {
@@ -322,30 +294,12 @@ class PhotoAlbumViewController: UIViewController,
                         while contains( photosToSelect, randoPhoto )
                         
                         photosToSelect[ newAlbumCounter ] = randoPhoto
-                        // println( "Added \( randoPhoto ) to the selected photos." )
-//                        while photosToSelect[ newAlbumCounter ] == 0
-//                        {
-//                            let randoPhoto = Int( arc4random_uniform( UInt32( newCollectionAlbumPossibles.count ) ) ) + 1
-//                            if !contains( photosToSelect, randoPhoto )
-//                            {
-//                                photosToSelect[ newAlbumCounter ] = randoPhoto
-//                                println( "Selected photo #\( randoPhoto )" )
-//                                // newAlbumCounter++
-//                            }
-//                            else
-//                            {
-//                                continue
-//                            }
-//                        }
                     }
-                    println( photosToSelect )
-                    dump( photosToSelect, name: nil, indent: 0, maxDepth: photosToSelect.count, maxItems: photosToSelect.count )
                     
                     var photoURLs: [ NSURL ] = []
                     for randoURLCounter in 0...newAlbumMax-1
                     {
                         let currentRando = photosToSelect[ randoURLCounter ]
-                        println( "Getting URL info for photo #\( currentRando )" )
                         let currentPhoto = newCollectionAlbumPossibles[ currentRando ] as [ String : AnyObject ]
                         
                         let farmID = currentPhoto[ "farm" ] as? Int
