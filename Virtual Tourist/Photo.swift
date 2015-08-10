@@ -18,6 +18,8 @@ class Photo: NSManagedObject
     @NSManaged var photoID: String
     @NSManaged var secret: String
     
+    var destination: Pin!
+    
     init(
         photoDictionary: [ String : AnyObject ],
         context: NSManagedObjectContext

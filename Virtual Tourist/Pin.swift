@@ -19,6 +19,8 @@ class Pin: NSManagedObject
     @NSManaged var pinNumber: Int16
     @NSManaged var mapPin: MKPinAnnotationView
     
+    var photoCollection: [ Photo ] = []
+    
     static var droppedPins = [ Int16 : Pin ]()
     static var totalPins: Int = 0
     
