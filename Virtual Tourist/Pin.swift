@@ -22,7 +22,11 @@ class Pin: NSManagedObject
     static var droppedPins = [ Int16 : Pin ]()
     static var totalPins: Int = 0
     
-    init( location: CLLocationCoordinate2D, pin: MKPinAnnotationView, context: NSManagedObjectContext )
+    init(
+        location: CLLocationCoordinate2D,
+        pin: MKPinAnnotationView,
+        context: NSManagedObjectContext
+    )
     {
         let pinEntity = NSEntityDescription.entityForName(
             "Pin",
@@ -45,7 +49,10 @@ class Pin: NSManagedObject
         Pin.droppedPins.updateValue( self, forKey: pinNumber )
     }
     
-    override init( entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext? )
+    override init(
+        entity: NSEntityDescription,
+        insertIntoManagedObjectContext context: NSManagedObjectContext?
+    )
     {
         super.init(
             entity: entity,
