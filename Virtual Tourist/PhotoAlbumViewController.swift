@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 AaronJ. All rights reserved.
 //
 
+// TODO: there's still a bug when removing pictures multiple times; eventually, the number of pictures in the album
+// and the number being returned by collectionView:numberOfItemsInSection() is not matching, therefore crashing the app.
+
 import UIKit
 import MapKit
 
@@ -219,6 +222,11 @@ class PhotoAlbumViewController: UIViewController,
                 "Remove Selected Pictures",
                 forState: .Normal
             )
+            newCollectionButton.removeTarget(
+                self,
+                action: "newCollection",
+                forControlEvents: .TouchUpInside
+            )
             newCollectionButton.addTarget(
                 self,
                 action: "removePictures",
@@ -241,6 +249,11 @@ class PhotoAlbumViewController: UIViewController,
             newCollectionButton.setTitle(
                 "New Collection",
                 forState: .Normal
+            )
+            newCollectionButton.removeTarget(
+                self,
+                action: "removePictures",
+                forControlEvents: .TouchUpInside
             )
             newCollectionButton.addTarget(
                 self,
@@ -358,6 +371,11 @@ class PhotoAlbumViewController: UIViewController,
         newCollectionButton.setTitle(
             "New Collection",
             forState: .Normal
+        )
+        newCollectionButton.removeTarget(
+            self,
+            action: "removePictures",
+            forControlEvents: .TouchUpInside
         )
         newCollectionButton.addTarget(
             self,
