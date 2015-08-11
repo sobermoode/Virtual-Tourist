@@ -12,7 +12,7 @@
         <attribute name="pinLatitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pinLongitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pinNumber" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <relationship name="photoCollection" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Photo" inverseName="destination" inverseEntity="Photo" syncable="YES"/>
+        <relationship name="photoCollection" toMany="YES" deletionRule="Nullify" destinationEntity="Photo" inverseName="destination" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <elements>
         <element name="Pin" positionX="-63" positionY="-18" width="128" height="120"/>

@@ -11,6 +11,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class PhotoAlbumViewController: UIViewController,
     UICollectionViewDataSource, UICollectionViewDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate {
@@ -21,7 +22,13 @@ class PhotoAlbumViewController: UIViewController,
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var destinationImagesCollection: UICollectionView!
     
-    var destination: CLLocationCoordinate2D!
+    // var destination: CLLocationCoordinate2D!
+    var destination: Pin!
+    
+    lazy var sharedContext: NSManagedObjectContext =
+    {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
+    }()
     
     // TODO: use currentPhotoAlbum.count instead, or 30 if it's greater than that
     var maxAlbumPhotos: Int = 30
@@ -40,7 +47,8 @@ class PhotoAlbumViewController: UIViewController,
     var flickrResultsPages: Int = 0
     var flickrResultsPerPage: Int = 0
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
-    var currentPhotoAlbum: [ UIImage? ] = []
+    // var currentPhotoAlbum: [ UIImage? ] = []
+    var currentPhotoAlbum: [ Photo? ] = []
     var currentResultsPage: Int = 1
     
     override func viewDidLoad() {
@@ -62,7 +70,7 @@ class PhotoAlbumViewController: UIViewController,
         navBar.items = [ navItem ]
         
         destinationMap.region = MKCoordinateRegion(
-            center: destination,
+            center: destination.coordinate,
             span: MKCoordinateSpan(
                 latitudeDelta: 0.1,
                 longitudeDelta: 0.1
@@ -70,7 +78,7 @@ class PhotoAlbumViewController: UIViewController,
         )
         
         let destinationAnnotation = MKPointAnnotation()
-        destinationAnnotation.coordinate = destination
+        destinationAnnotation.coordinate = destination.coordinate
         
         destinationMap.addAnnotation( destinationAnnotation )
         
@@ -84,6 +92,23 @@ class PhotoAlbumViewController: UIViewController,
             forControlEvents: .TouchUpInside
         )
         
+        if !destination.photoCollection.isEmpty
+        {
+            currentPhotoAlbum = destination.photoCollection
+        }
+        else
+        {
+            requestInitialPhotoAlbum()
+        }
+        
+        // code for requestInitialPhotoAlbum was here, originally
+        
+        destination.photoCollection = currentPhotoAlbum
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    func requestInitialPhotoAlbum()
+    {
         let flickrURL = NSURL( string: flickrQuery )!
         
         let flickrTask = NSURLSession.sharedSession().dataTaskWithURL( flickrURL )
@@ -101,7 +126,7 @@ class PhotoAlbumViewController: UIViewController,
                     flickrData,
                     options: nil,
                     error: jsonificationError
-                ) as? [ String : AnyObject ]
+                    ) as? [ String : AnyObject ]
                 {
                     let photos = results[ "photos" ] as! [ String : AnyObject ]
                     self.flickrResultsPages = photos[ "pages" ] as! Int
@@ -112,44 +137,63 @@ class PhotoAlbumViewController: UIViewController,
                     // for every subsequent request for a new collection, test for ( remainingInPage - 30 > 0 )
                     // and if not, that ( remainingPages > 0 ), and get the next 30 photos or the first 30 from
                     // the next page. then update remainingInPage and remainingPages.
-                    var photoURLs: [ NSURL ] = []
+                    // var photoURLs: [ NSURL ] = []
                     var initialAlbumMax = ( self.flickrResultsPhotos.count > 30 ) ? 30 : self.flickrResultsPhotos.count
-                    for initialAlbumCounter in 1...initialAlbumMax
+                    self.currentPhotoAlbum = [ Photo? ]( count: initialAlbumMax-1, repeatedValue: nil )
+                    for initialAlbumCounter in 0...initialAlbumMax-1
                     {
                         let currentPhoto = self.flickrResultsPhotos[ initialAlbumCounter ] as [ String : AnyObject ]
+                        let farmID = currentPhoto[ "farm" ] as! Int
+                        let serverID = currentPhoto[ "server" ] as! String
+                        let photoID = currentPhoto[ "id" ] as! String
+                        let secret = currentPhoto[ "secret" ] as! String
                         
-                        let farmID = currentPhoto[ "farm" ] as? Int
-                        let serverID = currentPhoto[ "server" ] as? String
-                        let photoID = currentPhoto[ "id" ] as? String
-                        let secret = currentPhoto[ "secret" ] as? String
+                        var photoInfo: [ String : AnyObject ] = [ : ]
+                        photoInfo.updateValue( farmID, forKey: "farmID" )
+                        photoInfo.updateValue( serverID, forKey: "serverID" )
+                        photoInfo.updateValue( photoID, forKey: "photoID" )
+                        photoInfo.updateValue( secret, forKey: "secret" )
                         
-                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
-                        let photoURL = NSURL( string: photoURLString )!
-                        photoURLs.append( photoURL )
+                        let newPhoto = Photo(
+                            photoDictionary: photoInfo,
+                            destinationPin: self.destination,
+                            context: self.sharedContext
+                        )
+                        
+                        // let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
+                        // let photoURL = NSURL( string: photoURLString )!
+                        // photoURLs.append( photoURL )
+                        // photoURLs.append( newPhoto.photoURL )
+                        // self.currentPhotoAlbum.append( newPhoto )
+                        self.currentPhotoAlbum[ initialAlbumCounter ] = newPhoto
                     }
                     
-                    self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
+                    // self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
                     var currentURLCounter = 0
-                    for currentURL in photoURLs
+                    for currentPhoto in self.currentPhotoAlbum
                     {
-                        dispatch_async( dispatch_get_main_queue() )
+                        if let currentURL = currentPhoto?.photoURL
                         {
-                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+                            dispatch_async( dispatch_get_main_queue() )
                             {
-                                photoData, photoResponse, photoError in
-                                
-                                if photoError != nil
+                                let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
                                 {
-                                    println( "There was an error getting the image from Flickr: \( photoError )." )
+                                    photoData, photoResponse, photoError in
+                                    
+                                    if photoError != nil
+                                    {
+                                        println( "There was an error getting the image from Flickr: \( photoError )." )
+                                    }
+                                    else
+                                    {
+                                        currentPhoto?.albumImage = UIImage( data: photoData )
+                                        self.currentPhotoAlbum[ currentURLCounter ] = currentPhoto
+                                    }
+                                    
+                                    currentURLCounter++
                                 }
-                                else
-                                {
-                                    self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
-                                }
-                                
-                                currentURLCounter++
+                                photoTask.resume()
                             }
-                            photoTask.resume()
                         }
                     }
                 }
@@ -198,8 +242,9 @@ class PhotoAlbumViewController: UIViewController,
         
         if currentPhotoAlbum[ indexPath.item ] != nil
         {
+            let currentPhoto = currentPhotoAlbum[ indexPath.item ]
             cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
-            cell.destinationImage.image = currentPhotoAlbum[ indexPath.item ]
+            cell.destinationImage.image = currentPhoto?.albumImage
         }
         
         cell.alpha = ( cell.selected ) ? 0.35 : 1.0
@@ -309,30 +354,46 @@ class PhotoAlbumViewController: UIViewController,
                         photosToSelect[ newAlbumCounter ] = randoPhoto
                     }
                     
-                    var photoURLs: [ NSURL ] = []
+                    // var photoURLs: [ NSURL ] = []
+                    self.currentPhotoAlbum = [ Photo? ]( count: newAlbumMax-1, repeatedValue: nil )
                     for randoURLCounter in 0...newAlbumMax-1
                     {
                         let currentRando = photosToSelect[ randoURLCounter ]
                         let currentPhoto = newCollectionAlbumPossibles[ currentRando ] as [ String : AnyObject ]
                         
-                        let farmID = currentPhoto[ "farm" ] as? Int
-                        let serverID = currentPhoto[ "server" ] as? String
-                        let photoID = currentPhoto[ "id" ] as? String
-                        let secret = currentPhoto[ "secret" ] as? String
+                        let farmID = currentPhoto[ "farm" ] as! Int
+                        let serverID = currentPhoto[ "server" ] as! String
+                        let photoID = currentPhoto[ "id" ] as! String
+                        let secret = currentPhoto[ "secret" ] as! String
                         
-                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
-                        let photoURL = NSURL( string: photoURLString )!
-                        photoURLs.append( photoURL )
+                        var photoInfo: [ String : AnyObject ] = [ : ]
+                        photoInfo.updateValue( farmID, forKey: "farmID" )
+                        photoInfo.updateValue( serverID, forKey: "serverID" )
+                        photoInfo.updateValue( photoID, forKey: "photoID" )
+                        photoInfo.updateValue( secret, forKey: "secret" )
+                        
+                        let newPhoto = Photo(
+                            photoDictionary: photoInfo,
+                            destinationPin: self.destination,
+                            context: self.sharedContext
+                        )
+                        
+//                        let photoURLString = "https://farm\( farmID! ).staticflickr.com/\( serverID! )/\( photoID! )_\( secret! ).jpg"
+//                        let photoURL = NSURL( string: photoURLString )!
+//                        photoURLs.append( photoURL )
+                        self.currentPhotoAlbum[ randoURLCounter ] = newPhoto
                     }
                     
-                    self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
+                    
                     self.maxAlbumPhotos = self.currentPhotoAlbum.count
                     var currentURLCounter = 0
-                    for currentURL in photoURLs
+                    for currentPhoto in self.currentPhotoAlbum
                     {
-                        dispatch_async( dispatch_get_main_queue() )
+                        if let currentURL = currentPhoto?.photoURL
                         {
-                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+                            dispatch_async( dispatch_get_main_queue() )
+                            {
+                                let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
                                 {
                                     photoData, photoResponse, photoError in
                                     
@@ -342,12 +403,15 @@ class PhotoAlbumViewController: UIViewController,
                                     }
                                     else
                                     {
-                                        self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
+                                        currentPhoto?.albumImage = UIImage( data: photoData )
+                                        self.currentPhotoAlbum[ currentURLCounter ] = currentPhoto
+                                        // self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
                                     }
                                     
                                     currentURLCounter++
+                                }
+                                photoTask.resume()
                             }
-                            photoTask.resume()
                         }
                     }
                 }
@@ -358,6 +422,9 @@ class PhotoAlbumViewController: UIViewController,
             }
         }
         newCollectionTask.resume()
+        
+        destination.photoCollection = currentPhotoAlbum
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func removePictures()

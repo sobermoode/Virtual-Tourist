@@ -19,9 +19,19 @@ class Photo: NSManagedObject
     @NSManaged var secret: String
     
     var destination: Pin!
+    var photoURLString: String
+    {
+        return "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
+    }
+    var photoURL: NSURL!
+    {
+        return NSURL( string: photoURLString )!
+    }
+    var albumImage: UIImage!
     
     init(
         photoDictionary: [ String : AnyObject ],
+        destinationPin: Pin,
         context: NSManagedObjectContext
     )
     {
@@ -35,7 +45,7 @@ class Photo: NSManagedObject
             insertIntoManagedObjectContext: context
         )
         
-        // initialize the four properties here
+        destination = destinationPin
         farmID = photoDictionary[ "farmID" ] as! Int16
         serverID = photoDictionary[ "serverID" ] as! String
         photoID = photoDictionary[ "photoID" ] as! String
@@ -51,5 +61,35 @@ class Photo: NSManagedObject
             entity: entity,
             insertIntoManagedObjectContext: context
         )
+    }
+    
+    class func fetchAllPhotos() -> [ Photo ]
+    {
+        println( "fetching all photos..." )
+        let fetchError: NSErrorPointer = nil
+        
+        let photosFetchRequest = NSFetchRequest( entityName: "Photo" )
+        
+        let photos: [ AnyObject ] = CoreDataStackManager.sharedInstance().managedObjectContext!.executeFetchRequest(
+            photosFetchRequest,
+            error: fetchError
+            )!
+        println( "photos.count: \( photos.count )" )
+        
+        if fetchError != nil
+        {
+            println( "There was an error fetching the pins from Core Data: \( fetchError )." )
+        }
+        
+        return photos as! [ Photo ]
+        
+//        var lastPhoto: Int = 0
+//        for photo in photos
+//        {
+//            // println( "Adding \( pin ) to Pin.droppedPins." )
+//            // Pin.droppedPins.updateValue( pin as! Pin, forKey: pin.pinNumber )
+//            // lastPhoto = Int( pin.pinNumber )
+//        }
+//        totalPins = lastPin
     }
 }

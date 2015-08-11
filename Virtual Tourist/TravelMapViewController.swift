@@ -199,7 +199,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         {
             // segue to photo album
             let photoAlbum = storyboard?.instantiateViewControllerWithIdentifier( "PhotoAlbum" ) as! PhotoAlbumViewController
-            photoAlbum.destination = view.annotation.coordinate
+            // photoAlbum.destination = view.annotation.coordinate
+            let pinNumber = Int16( view.annotation.title!.toInt()! )
+            let destinationPin: Pin = Pin.droppedPins[ pinNumber ]!
+            photoAlbum.destination = destinationPin
             
             presentViewController(
                 photoAlbum,
