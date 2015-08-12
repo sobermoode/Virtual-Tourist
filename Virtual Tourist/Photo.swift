@@ -46,7 +46,11 @@ class Photo: NSManagedObject
         )
         
         destination = destinationPin
-        farmID = photoDictionary[ "farmID" ] as! Int16
+        // let farm = photoDictionary[ "farmID" ] as! CInt
+        // let intmax = farm.toIntMax()
+        // farmID = Int16( intmax )
+        let farm = photoDictionary[ "farmID" ] as! NSNumber
+        farmID = Int16( farm.integerValue )
         serverID = photoDictionary[ "serverID" ] as! String
         photoID = photoDictionary[ "photoID" ] as! String
         secret = photoDictionary[ "secret" ] as! String

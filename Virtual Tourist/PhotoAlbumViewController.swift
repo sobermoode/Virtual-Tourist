@@ -103,7 +103,7 @@ class PhotoAlbumViewController: UIViewController,
         
         // code for requestInitialPhotoAlbum was here, originally
         
-        destination.photoCollection = currentPhotoAlbum
+        // destination.photoCollection = currentPhotoAlbum
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
@@ -144,6 +144,7 @@ class PhotoAlbumViewController: UIViewController,
                     {
                         let currentPhoto = self.flickrResultsPhotos[ initialAlbumCounter ] as [ String : AnyObject ]
                         let farmID = currentPhoto[ "farm" ] as! Int
+                        // let farmNumber = farmID.intValue
                         let serverID = currentPhoto[ "server" ] as! String
                         let photoID = currentPhoto[ "id" ] as! String
                         let secret = currentPhoto[ "secret" ] as! String
@@ -193,6 +194,7 @@ class PhotoAlbumViewController: UIViewController,
                                     currentURLCounter++
                                 }
                                 photoTask.resume()
+                                // self.destinationImagesCollection.reloadData()
                             }
                         }
                     }
@@ -411,6 +413,7 @@ class PhotoAlbumViewController: UIViewController,
                                     currentURLCounter++
                                 }
                                 photoTask.resume()
+                                // self.destinationImagesCollection.reloadData()
                             }
                         }
                     }
@@ -434,6 +437,8 @@ class PhotoAlbumViewController: UIViewController,
         destinationImagesCollection.deleteItemsAtIndexPaths(
             destinationImagesCollection.indexPathsForSelectedItems() as! [ NSIndexPath ]
         )
+        
+        CoreDataStackManager.sharedInstance().saveContext()
         
         newCollectionButton.setTitle(
             "New Collection",
