@@ -13,21 +13,25 @@ import CoreData
 
 class Photo: NSManagedObject
 {
-    @NSManaged var farmID: Int16
+    @NSManaged var farmID: NSNumber
     @NSManaged var serverID: String
     @NSManaged var photoID: String
     @NSManaged var secret: String
     
-    var destination: Pin!
-    var photoURLString: String
-    {
-        return "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
-    }
+    @NSManaged var destination: Pin!
+//    var photoURLString: String
+//    {
+//        // let farmNumber = farmID.integerValue
+//        // println( farmNumber )
+//        return "https://farm\( farmID.integerValue ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
+//    }
+    var photoURLString: String!
     var photoURL: NSURL!
     {
         return NSURL( string: photoURLString )!
     }
-    var albumImage: UIImage!
+    // var albumImage: UIImage!
+    var albumImage: UIImage? = nil
     
     init(
         photoDictionary: [ String : AnyObject ],
@@ -35,6 +39,7 @@ class Photo: NSManagedObject
         context: NSManagedObjectContext
     )
     {
+        println( "Initializing a new Photo..." )
         let photoEntity = NSEntityDescription.entityForName(
             "Photo",
             inManagedObjectContext: context
@@ -49,11 +54,12 @@ class Photo: NSManagedObject
         // let farm = photoDictionary[ "farmID" ] as! CInt
         // let intmax = farm.toIntMax()
         // farmID = Int16( intmax )
-        let farm = photoDictionary[ "farmID" ] as! NSNumber
-        farmID = Int16( farm.integerValue )
+        farmID = photoDictionary[ "farmID" ] as! Int
+        // farmID = Int16( farm.integerValue )
         serverID = photoDictionary[ "serverID" ] as! String
         photoID = photoDictionary[ "photoID" ] as! String
         secret = photoDictionary[ "secret" ] as! String
+        photoURLString = "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
     }
     
     override init(

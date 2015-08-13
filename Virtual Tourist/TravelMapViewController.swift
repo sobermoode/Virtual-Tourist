@@ -96,17 +96,17 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         }
         else
         {
-            mapView.region = MKCoordinateRegion()
-//            mapView.region = MKCoordinateRegion(
-//                center: CLLocationCoordinate2D(
-//                    latitude: mapInfo[ "centerLatitude" ]!,
-//                    longitude: mapInfo[ "centerLongitude" ]!
-//                ),
-//                span: MKCoordinateSpan(
-//                    latitudeDelta: ( mapInfo[ "spanLatitudeDelta" ]! ),
-//                    longitudeDelta: ( mapInfo[ "spanLongitudeDelta" ]! )
-//                )
-//            )
+            // mapView.region = MKCoordinateRegion()
+            mapView.region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(
+                    latitude: 33.862237,
+                    longitude: -118.399519
+                ),
+                span: MKCoordinateSpan(
+                    latitudeDelta: 3.0,
+                    longitudeDelta: 3.0
+                )
+            )
 //            println( "Couldn't get the map info..." )
         }
         
@@ -203,6 +203,10 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
             let pinNumber = Int16( view.annotation.title!.toInt()! )
             let destinationPin: Pin = Pin.droppedPins[ pinNumber ]!
             photoAlbum.destination = destinationPin
+            if destinationPin.photoCollection.count != 0
+            {
+                photoAlbum.currentPhotoAlbum = destinationPin.photoCollection
+            }
             
             presentViewController(
                 photoAlbum,

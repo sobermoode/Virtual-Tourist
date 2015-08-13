@@ -26,7 +26,7 @@ class Pin: NSManagedObject
             longitude: pinLongitude
         )
     }
-    var photoCollection: [ Photo? ] = []
+    @NSManaged var photoCollection: [ Photo ]
     
     static var droppedPins = [ Int16 : Pin ]()
     static var totalPins: Int = 0

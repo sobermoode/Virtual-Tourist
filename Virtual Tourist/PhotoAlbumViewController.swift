@@ -9,6 +9,8 @@
 // TODO: there's still a bug when removing pictures multiple times; eventually, the number of pictures in the album
 // and the number being returned by collectionView:numberOfItemsInSection() is not matching, therefore crashing the app.
 
+// TODO: make a dummy dictionary to use to initialize the Photo array with capacity
+
 import UIKit
 import MapKit
 import CoreData
@@ -48,8 +50,16 @@ class PhotoAlbumViewController: UIViewController,
     var flickrResultsPerPage: Int = 0
     var flickrResultsPhotos: [ [ String : AnyObject ] ] = []
     // var currentPhotoAlbum: [ UIImage? ] = []
-    var currentPhotoAlbum: [ Photo? ] = []
+    var currentPhotoAlbum: [ Photo ] = []
     var currentResultsPage: Int = 1
+    
+    let dummyPhotoDictionary: [ String : AnyObject ] =
+    [
+        "farmID" : 9999,
+        "serverID" : "9999",
+        "photoID" : "9999",
+        "secret" : "XXXX"
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -104,7 +114,7 @@ class PhotoAlbumViewController: UIViewController,
         // code for requestInitialPhotoAlbum was here, originally
         
         // destination.photoCollection = currentPhotoAlbum
-        CoreDataStackManager.sharedInstance().saveContext()
+        // CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func requestInitialPhotoAlbum()
@@ -132,6 +142,7 @@ class PhotoAlbumViewController: UIViewController,
                     self.flickrResultsPages = photos[ "pages" ] as! Int
                     self.flickrResultsPerPage = photos[ "perpage" ] as! Int
                     self.flickrResultsPhotos = photos[ "photo" ] as! [ [ String : AnyObject ] ]
+                    println( "flickrResultsPhotos.count: \( self.flickrResultsPhotos.count )" )
                     
                     // set the initial photo album to the first 30 images (or max that was returned if less)
                     // for every subsequent request for a new collection, test for ( remainingInPage - 30 > 0 )
@@ -139,11 +150,14 @@ class PhotoAlbumViewController: UIViewController,
                     // the next page. then update remainingInPage and remainingPages.
                     // var photoURLs: [ NSURL ] = []
                     var initialAlbumMax = ( self.flickrResultsPhotos.count > 30 ) ? 30 : self.flickrResultsPhotos.count
-                    self.currentPhotoAlbum = [ Photo? ]( count: initialAlbumMax-1, repeatedValue: nil )
+                    // self.currentPhotoAlbum = [ Photo? ]( count: initialAlbumMax-1, repeatedValue: nil )
+                    println( "Initing self.currentPhotoAlbum with \( initialAlbumMax ) photos..." )
+                    self.currentPhotoAlbum = [ Photo ]( count: initialAlbumMax, repeatedValue: Photo(photoDictionary: self.dummyPhotoDictionary, destinationPin: self.destination, context: self.sharedContext) )
                     for initialAlbumCounter in 0...initialAlbumMax-1
                     {
+                        println( "Adding actual Photos..." )
                         let currentPhoto = self.flickrResultsPhotos[ initialAlbumCounter ] as [ String : AnyObject ]
-                        let farmID = currentPhoto[ "farm" ] as! Int
+                        let farmID = currentPhoto[ "farm" ] as! NSNumber
                         // let farmNumber = farmID.intValue
                         let serverID = currentPhoto[ "server" ] as! String
                         let photoID = currentPhoto[ "id" ] as! String
@@ -171,9 +185,11 @@ class PhotoAlbumViewController: UIViewController,
                     
                     // self.currentPhotoAlbum = [ UIImage? ]( count: photoURLs.count, repeatedValue: nil )
                     var currentURLCounter = 0
-                    for currentPhoto in self.currentPhotoAlbum
+                    for currentPhoto1 in self.currentPhotoAlbum
                     {
-                        if let currentURL = currentPhoto?.photoURL
+                        println( "currentPhoto: \( currentPhoto1 )" )
+                        println( "currentPhoto.photoURL: \( currentPhoto1.photoURL )" )
+                        if let currentURL = currentPhoto1.photoURL
                         {
                             dispatch_async( dispatch_get_main_queue() )
                             {
@@ -187,13 +203,14 @@ class PhotoAlbumViewController: UIViewController,
                                     }
                                     else
                                     {
-                                        currentPhoto?.albumImage = UIImage( data: photoData )
-                                        self.currentPhotoAlbum[ currentURLCounter ] = currentPhoto
+                                        currentPhoto1.albumImage = UIImage( data: photoData )
+                                        self.currentPhotoAlbum[ currentURLCounter ] = currentPhoto1
                                     }
                                     
                                     currentURLCounter++
                                 }
                                 photoTask.resume()
+                                CoreDataStackManager.sharedInstance().saveContext()
                                 // self.destinationImagesCollection.reloadData()
                             }
                         }
@@ -206,6 +223,7 @@ class PhotoAlbumViewController: UIViewController,
             }
         }
         flickrTask.resume()
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func backToMap( sender: UIBarButtonItem )
@@ -242,11 +260,16 @@ class PhotoAlbumViewController: UIViewController,
             return cell
         }
         
-        if currentPhotoAlbum[ indexPath.item ] != nil
+//        if currentPhotoAlbum[ indexPath.item ] != nil
+//        {
+//            let currentPhoto = currentPhotoAlbum[ indexPath.item ]
+//            cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
+//            cell.destinationImage.image = currentPhoto?.albumImage
+//        }
+        if currentPhotoAlbum[ indexPath.item ].albumImage != nil
         {
-            let currentPhoto = currentPhotoAlbum[ indexPath.item ]
             cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
-            cell.destinationImage.image = currentPhoto?.albumImage
+            cell.destinationImage.image = currentPhotoAlbum[ indexPath.item ].albumImage
         }
         
         cell.alpha = ( cell.selected ) ? 0.35 : 1.0
@@ -357,7 +380,7 @@ class PhotoAlbumViewController: UIViewController,
                     }
                     
                     // var photoURLs: [ NSURL ] = []
-                    self.currentPhotoAlbum = [ Photo? ]( count: newAlbumMax-1, repeatedValue: nil )
+                    self.currentPhotoAlbum = [ Photo ]( count: newAlbumMax-1, repeatedValue: Photo() )
                     for randoURLCounter in 0...newAlbumMax-1
                     {
                         let currentRando = photosToSelect[ randoURLCounter ]
@@ -391,7 +414,7 @@ class PhotoAlbumViewController: UIViewController,
                     var currentURLCounter = 0
                     for currentPhoto in self.currentPhotoAlbum
                     {
-                        if let currentURL = currentPhoto?.photoURL
+                        if let currentURL = currentPhoto.photoURL
                         {
                             dispatch_async( dispatch_get_main_queue() )
                             {
@@ -405,7 +428,7 @@ class PhotoAlbumViewController: UIViewController,
                                     }
                                     else
                                     {
-                                        currentPhoto?.albumImage = UIImage( data: photoData )
+                                        currentPhoto.albumImage = UIImage( data: photoData )
                                         self.currentPhotoAlbum[ currentURLCounter ] = currentPhoto
                                         // self.currentPhotoAlbum[ currentURLCounter ] = UIImage( data: photoData )
                                     }
@@ -413,6 +436,7 @@ class PhotoAlbumViewController: UIViewController,
                                     currentURLCounter++
                                 }
                                 photoTask.resume()
+                                CoreDataStackManager.sharedInstance().saveContext()
                                 // self.destinationImagesCollection.reloadData()
                             }
                         }
