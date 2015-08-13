@@ -167,10 +167,10 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
-        <!--Photo Album View Controller-->
+        <!--Photo Album View Controller2-->
         <scene sceneID="aox-gx-pEb">
             <objects>
-                <viewController storyboardIdentifier="PhotoAlbum" id="dS8-E0-co4" customClass="PhotoAlbumViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoAlbum2" id="dS8-E0-co4" customClass="PhotoAlbumViewController2" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Ria-qU-QEH"/>
                         <viewControllerLayoutGuide type="bottom" id="lfI-6N-svv"/>

@@ -19,13 +19,13 @@ class Photo: NSManagedObject
     @NSManaged var secret: String
     
     @NSManaged var destination: Pin!
-//    var photoURLString: String
-//    {
-//        // let farmNumber = farmID.integerValue
-//        // println( farmNumber )
-//        return "https://farm\( farmID.integerValue ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
-//    }
-    var photoURLString: String!
+    var photoURLString: String
+    {
+        // let farmNumber = farmID.integerValue
+        // println( farmNumber )
+        return "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
+    }
+    // var photoURLString: String!
     var photoURL: NSURL!
     {
         return NSURL( string: photoURLString )!
@@ -59,7 +59,7 @@ class Photo: NSManagedObject
         serverID = photoDictionary[ "serverID" ] as! String
         photoID = photoDictionary[ "photoID" ] as! String
         secret = photoDictionary[ "secret" ] as! String
-        photoURLString = "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
+        // photoURLString = "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
     }
     
     override init(
