@@ -54,6 +54,7 @@ class Pin: NSManagedObject
         pinNumber = Int16( Pin.totalPins )
         mapPin = pin
         println( "initing with mapPin.annotation: \( pin.annotation )." )
+        // photoCollection = [ Photo ]()
         
         Pin.droppedPins.updateValue( self, forKey: pinNumber )
     }

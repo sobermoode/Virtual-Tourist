@@ -198,11 +198,18 @@ class TravelMapViewController: UIViewController, MKMapViewDelegate {
         if !inEditMode
         {
             // segue to photo album
-            let photoAlbum = storyboard?.instantiateViewControllerWithIdentifier( "PhotoAlbum2" ) as! PhotoAlbumViewController
+            let photoAlbum = storyboard?.instantiateViewControllerWithIdentifier( "PhotoAlbum2" ) as! PhotoAlbumViewController2
             // photoAlbum.destination = view.annotation.coordinate
             let pinNumber = Int16( view.annotation.title!.toInt()! )
             let destinationPin: Pin = Pin.droppedPins[ pinNumber ]!
             photoAlbum.destination = destinationPin
+            
+            // TODO: attempt this tomorrow. gonna need some modification to the photo album controller;
+            // ie., removing references to where the Pin object is used
+            // ( actually, this might not work, because i still need the pin to init a photo,
+            // but it might be worth trying to send the photo array along with the pin, as two separate objects.
+            //photoAlbum.currentPhotoAlbum = destinationPin.photoCollection
+            
 //            if destinationPin.photoCollection.count != 0
 //            {
 //                photoAlbum.currentPhotoAlbum = destinationPin.photoCollection

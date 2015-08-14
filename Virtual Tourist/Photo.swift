@@ -39,7 +39,7 @@ class Photo: NSManagedObject
         context: NSManagedObjectContext
     )
     {
-        println( "Initializing a new Photo..." )
+        // println( "Initializing a new Photo..." )
         let photoEntity = NSEntityDescription.entityForName(
             "Photo",
             inManagedObjectContext: context
@@ -60,6 +60,8 @@ class Photo: NSManagedObject
         photoID = photoDictionary[ "photoID" ] as! String
         secret = photoDictionary[ "secret" ] as! String
         // photoURLString = "https://farm\( farmID ).staticflickr.com/\( serverID )/\( photoID )_\( secret ).jpg"
+        
+        // println( "Finished initializing a new Photo..." )
     }
     
     override init(

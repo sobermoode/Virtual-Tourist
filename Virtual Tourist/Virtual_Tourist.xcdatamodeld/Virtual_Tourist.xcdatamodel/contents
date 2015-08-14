@@ -2,9 +2,9 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14E46" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Photo" syncable="YES">
         <attribute name="farmID" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="secret" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="serverID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoID" attributeType="String" syncable="YES"/>
+        <attribute name="secret" attributeType="String" syncable="YES"/>
+        <attribute name="serverID" attributeType="String" syncable="YES"/>
         <relationship name="destination" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="photoCollection" inverseEntity="Pin" syncable="YES"/>
     </entity>
     <entity name="Pin" representedClassName="Pin" syncable="YES">
@@ -12,7 +12,7 @@
         <attribute name="pinLatitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pinLongitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pinNumber" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <relationship name="photoCollection" toMany="YES" deletionRule="Nullify" destinationEntity="Photo" inverseName="destination" inverseEntity="Photo" syncable="YES"/>
+        <relationship name="photoCollection" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Photo" inverseName="destination" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <elements>
         <element name="Photo" positionX="-63" positionY="9" width="128" height="120"/>

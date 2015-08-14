@@ -21,7 +21,9 @@ class PhotoAlbumViewController2: UIViewController,
     
     var destination: Pin!
     var maxAlbumPhotos: Int = 30
-    // var currentPhotoAlbum: [ Photo ]
+    
+    // TODO: testing array
+    var currentPhotoAlbum = [ Photo ]()
     
     let flickrQuery = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=71549104e5500eb7d194d040cc55ea10&lat=33.862237&lon=-118.399519&format=json&nojsoncallback=1"
     
@@ -55,6 +57,14 @@ class PhotoAlbumViewController2: UIViewController,
         if destination.photoCollection.isEmpty
         {
             requestInitialPhotoAlbum()
+        }
+        else
+        {
+            println( "The Pin's photoCollection isn't empty!!!" )
+            currentPhotoAlbum = destination.photoCollection
+            // Photo.fetchAllPhotos()
+            println( currentPhotoAlbum )
+            // println( destination.photoCollection )
         }
     }
     
@@ -106,6 +116,7 @@ class PhotoAlbumViewController2: UIViewController,
             }
             else
             {
+                // println( flickrData )
                 var jsonificationError: NSErrorPointer = nil
                 if let results = NSJSONSerialization.JSONObjectWithData(
                     flickrData,
@@ -113,12 +124,14 @@ class PhotoAlbumViewController2: UIViewController,
                     error: jsonificationError
                     ) as? [ String : AnyObject ]
                 {
-                    let photos = results[ "photos" ] as! [ [ String : AnyObject ] ]
+                    let photos = results[ "photos" ] as! [ String : AnyObject ]
+                    let photoArray = photos[ "photo" ] as! [[ String : AnyObject ]]
                     
                     // create Photo objects from the Flickr results
                     for initialAlbumCounter in 0...self.maxAlbumPhotos - 1
                     {
-                        let currentPhoto = photos[ initialAlbumCounter ] as [ String : AnyObject ]
+                        let currentPhoto = photoArray[ initialAlbumCounter ] as [ String : AnyObject ]
+                        // println( "currentPhoto: \( currentPhoto )" )
                         let farmID = currentPhoto[ "farm" ] as! NSNumber
                         let serverID = currentPhoto[ "server" ] as! String
                         let photoID = currentPhoto[ "id" ] as! String
@@ -136,38 +149,19 @@ class PhotoAlbumViewController2: UIViewController,
                             context: self.sharedContext
                         )
                         
-                        self.destination.photoCollection.append( newPhoto )
+                        self.currentPhotoAlbum.append( newPhoto )
+                        
+                        CoreDataStackManager.sharedInstance().saveContext()
+                        
+                        // newPhoto.destination = self.destination
+                        
+                        // self.destination.photoCollection.append( newPhoto )
                     }
                     
+                    // self.currentPhotoAlbum = self.destination.photoCollection
+                    
                     // use the Photo objects' URLs to get the images from Flickr
-                    var currentURLCounter = 0
-                    for currentPhoto in self.destination.photoCollection
-                    {
-                        let currentURL = currentPhoto.photoURL
-                        
-                        dispatch_async( dispatch_get_main_queue() )
-                        {
-                            let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
-                            {
-                                photoData, photoResponse, photoError in
-                                
-                                if photoError != nil
-                                {
-                                    println( "There was an error getting the image from Flickr: \( photoError )." )
-                                }
-                                else
-                                {
-                                    currentPhoto.albumImage = UIImage( data: photoData )
-                                }
-                                
-                                currentURLCounter++
-                            }
-                            photoTask.resume()
-                            
-                            CoreDataStackManager.sharedInstance().saveContext()
-                            self.destinationImagesCollection.reloadData()
-                        }
-                    }
+                    self.getPhotosFromFlickr()
                 }
                 else
                 {
@@ -177,7 +171,70 @@ class PhotoAlbumViewController2: UIViewController,
         }
         flickrTask.resume()
         
+        println( currentPhotoAlbum.count )
+        
         CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    func getPhotosFromFlickr()
+    {
+        dispatch_async( dispatch_get_main_queue() )
+        {
+            println( "Starting constructing URLs for images..." )
+            println( "The first photo is \( self.currentPhotoAlbum[ 0 ] )" )
+            for currentPhoto in 0...self.currentPhotoAlbum.count - 1
+            {
+                if let thePhoto = self.currentPhotoAlbum[ currentPhoto ] as Photo?
+                {
+                    let currentURL = thePhoto.photoURL
+                    
+                    let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+                    {
+                        photoData, photoResponse, photoError in
+                        
+                        if photoError != nil
+                        {
+                            println( "There was an error getting the image from Flickr: \( photoError )." )
+                        }
+                        else
+                        {
+                            thePhoto.albumImage = UIImage( data: photoData )
+                        }
+                    }
+                    photoTask.resume()
+                }
+                
+                CoreDataStackManager.sharedInstance().saveContext()
+                self.destinationImagesCollection.reloadData()
+            }
+            
+            // let currentPhotos = self.destination.photoCollection as! [ Photo ]
+//            for currentPhoto in self.currentPhotoAlbum
+//            {
+//                let thePhoto = currentPhoto as Photo
+//                let currentURL = thePhoto.photoURL
+//                println( "currentURL: \( currentURL )" )
+//                
+//                println( "Starting a photo task..." )
+//                let photoTask = NSURLSession.sharedSession().dataTaskWithURL( currentURL )
+//                {
+//                    photoData, photoResponse, photoError in
+//                    
+//                    if photoError != nil
+//                    {
+//                        println( "There was an error getting the image from Flickr: \( photoError )." )
+//                    }
+//                    else
+//                    {
+//                        thePhoto.albumImage = UIImage( data: photoData )
+//                    }
+//                }
+//                photoTask.resume()
+//                
+//                CoreDataStackManager.sharedInstance().saveContext()
+//                self.destinationImagesCollection.reloadData()
+//            }
+        }
     }
     
     // return to the map
@@ -196,7 +253,7 @@ class PhotoAlbumViewController2: UIViewController,
         numberOfItemsInSection section: Int
     ) -> Int
     {
-        return destination.photoCollection.count
+        return currentPhotoAlbum.count
     }
     
     func collectionView(
@@ -215,7 +272,7 @@ class PhotoAlbumViewController2: UIViewController,
         cell.frame.size.height = cell.frame.size.width
         
         // make sure the Photo object finished getting an image from Flickr
-        if let theAlbumImage = destination.photoCollection[ indexPath.item ].albumImage
+        if let theAlbumImage = currentPhotoAlbum[ indexPath.item ].albumImage
         {
             cell.destinationImage.contentMode = UIViewContentMode.ScaleAspectFill
             cell.destinationImage.image = theAlbumImage
